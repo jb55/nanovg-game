@@ -15,7 +15,6 @@ bgfx-nanovg.o: bgfx-nanovg.cpp
 	$(CXX) -c $(CFLAGS) $< -o $@
 
 install: all
-	mkdir -p $(PREFIX)/{lib,include}
-	mkdir -p $(PREFIX)/include/bgfx-nanovg
+	mkdir -p $(PREFIX)/{lib,include/bgfx-nanovg}
 	cp $(LIBS) $(PREFIX)/lib
 	cp $(INCLUDES) $(PREFIX)/include/bgfx-nanovg
