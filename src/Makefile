@@ -11,7 +11,7 @@ CFLAGS = -g
 all: hello
 
 hello: hello.o
-	$(CC) $(CFLAGS) $(LINKOPTS) $<  -o $@ 
+	$(CC) $(CFLAGS) $(LINKOPTS) $< -o $@
 
 %.o: %.t
 	terra $^ $(basename $@)

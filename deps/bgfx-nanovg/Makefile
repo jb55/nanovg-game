@@ -2,7 +2,7 @@
 CFLAGS ?= -O2 -fPIC
 PREFIX ?= /usr/local
 LIBS = bgfx-nanovg.a
-INCLUDES = vs_nanovg_fill.bin.h fs_nanovg_fill.bin.h
+INCLUDES = bgfx-nanovg.h vs_nanovg_fill.bin.h fs_nanovg_fill.bin.h
 LDFLAGS = -lnanovg -lbgfx $(shell pkg-config --libs bgfx)
 
 include ./shader-embeded.mk

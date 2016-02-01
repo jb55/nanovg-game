@@ -49,7 +49,7 @@ in stdenv.mkDerivation rec {
   INCLUDE_PATH=".;./common;${buildPaths ";" (f: "${f}/include")}";
 
   meta = with stdenv.lib; {
-    description = "NanoVG portable game";
+    description = "NanoVG game";
     homepage = "https://github.com/jb55/nanovg-game";
     maintainers = with maintainers; [ jb55 ];
     license = licenses.mit;
