@@ -3,6 +3,8 @@ C = terralib.includecstring [[
   #include <bgfx/c99/bgfx.h>
   #include <stdio.h>
   #include "logo.h"
+  #include <nanovg/nanovg.h>
+  #include <bgfx-nanovg/bgfx-nanovg.h>
 
   extern bool entry_process_events(uint32_t* _width, uint32_t* _height, uint32_t* _debug, uint32_t* _reset);
 ]]

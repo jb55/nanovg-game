@@ -1,15 +1,15 @@
 
 CFLAGS ?= -O2 -fPIC
 PREFIX ?= /usr/local
-LIBS = bgfx-nanovg.a
+LIBS = libbgfx-nanovg.a
 INCLUDES = bgfx-nanovg.h vs_nanovg_fill.bin.h fs_nanovg_fill.bin.h
 
 include ./shader-embeded.mk
 
 all: $(LIBS) $(INCLUDES)
 
-bgfx-nanovg.a: bgfx-nanovg.o
-	$(AR) cr $@ $<
+libbgfx-nanovg.a: bgfx-nanovg.o
+	$(AR) rcs $@ $<
 
 bgfx-nanovg.o: bgfx-nanovg.cpp
 	$(CXX) -c $(CFLAGS) $< -o $@
