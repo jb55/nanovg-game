@@ -13,7 +13,7 @@ hello: hello.o
 nanovg: nanovg.o
 	$(CC) $(CFLAGS) $< $(LINKOPTS) -o $@
 
-%.o: %.t
+%.o: %.t lang/nvg.t
 	terra $^ $(basename $@)
 
 clean:

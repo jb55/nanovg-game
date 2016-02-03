@@ -1,6 +1,32 @@
 
 
-require 'c'
+C = require 'c'
+
+function rgb(r,g,b,a)
+  return `C.nvgRGBA(r,g,b,a)
+end
+
+function testlang(nvg, t)
+  import "lang/nvg"
+  ctx nvg
+  beginpath
+  circle `600 + (t * 10 * C.cosf(16f)) 256 200
+  fillcolor rgba 255 255 255 255
+  fill
+  beginpath
+  circle 600 600 `200 * C.cosf(t * 0.5f)
+  fillcolor rgba 255 255 255 128
+  fill
+  return done
+end
+
+terra render_demo(nvg : &C.NVGcontext, width : float, height : float, t : float)
+
+  C.bgfx_dbg_text_printf(0, 3, 0x6f, "time: %f", t)
+
+  [ testlang(nvg, t) ]
+end
+
 
 terra main(argc : int, argv : &rawstring)
   var width : uint32 = 1280
@@ -22,7 +48,13 @@ terra main(argc : int, argv : &rawstring)
 	var nvg : &C.NVGcontext = C.nvgCreate(1, 0)
 	C.bgfx_set_view_seq(0, true)
 
+  var time_offset = C.hp_counter()
+
   while not C.entry_process_events(&width, &height, &debug, &reset) do
+    var now = C.hp_counter()
+    var freq : double = C.hp_frequency()
+    var time : float = (now - time_offset) / freq
+
     -- Set view 0 default viewport.
     C.bgfx_set_view_rect(0, 0, 0, width, height)
 
@@ -37,10 +69,7 @@ terra main(argc : int, argv : &rawstring)
 
 		C.nvgBeginFrame(nvg, width, height, 1.0)
 
-      C.nvgBeginPath(nvg)
-      C.nvgCircle(nvg, 250, 250, 100.0)
-      C.nvgFillColor(nvg, C.nvgRGBA(32,32,32,255))
-      C.nvgFill(nvg);
+    render_demo(nvg, width, height, time)
 
 		C.nvgEndFrame(nvg);
 
