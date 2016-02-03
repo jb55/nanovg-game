@@ -4,7 +4,7 @@ local C = terralib.includecstring [[
   #include <bgfx/c99/bgfx.h>
   #include <stdio.h>
   #include "logo.h"
-  #include <nanovg/nanovg.h>
+  #include <nanovg.h>
   #include <math.h>
   #include <hp-counter/hp-counter.h>
   #include <bgfx-nanovg/bgfx-nanovg.h>
