@@ -9,15 +9,15 @@ end
 function testlang(nvg, t)
   import "lang/nvg"
   ctx nvg
-  beginpath
   for i=1,10 do
-    local x = `600 + (t * (i * 10) * C.cosf(16f))
-    local y = `256 + (i * 10)
-    local r = `20 + (i * 10)
-    local g = i * 10
+    local x = `600 + ((i * 50) * C.cosf(t))
+    local y = 256 + (i * 10)
+    local r = 20 + (i * 10)
+    local g = `int32(C.sinf(t * 0.5f) * 0.5f * i)
+    local b = 125
     beginpath
     circle x y r
-    fillcolor rgba i g 255 255
+    fillcolor rgba i g b 255
     fill
   end
   return done
