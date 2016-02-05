@@ -17,6 +17,8 @@ function testlang(nvg, t)
   return done
 end
 
+local testmacro = macro(testlang)
+
 -- 500 x 500
 -- 15 pix spacing
 -- 105 x 105 blocks
@@ -29,7 +31,17 @@ struct Game {
   vg : &C.NVGcontext;
   bx : float;
   by : float;
+  font_normal : int;
 }
+
+terra load_data(game : &Game) : int
+  var vg = game.vg;
+	game.font_normal = C.nvgCreateFont(vg, "sans", "font/roboto-regular.ttf");
+  if game.font_normal == -1 then
+    C.printf("Could not load regular font")
+    return -1
+  end
+end
 
 terra draw_tile(game : &Game, x : float, y : float, ts : int, n : int)
   var vg = game.vg;
@@ -47,7 +59,7 @@ terra draw_tile(game : &Game, x : float, y : float, ts : int, n : int)
   C.nvgFill(vg);
 
 	C.nvgFontSize(vg, 24.0f);
-	C.nvgFontFace(vg, "Comic Sans");
+	C.nvgFontFace(vg, "sans");
 	C.nvgFillColor(vg, [rgb(0,0,0,255)]);
 	C.nvgTextAlign(vg, C.NVG_ALIGN_LEFT or C.NVG_ALIGN_MIDDLE);
   C.nvgText(vg, 100, 100, "ksdhfasdjhfaslkdjfh", nil);
@@ -84,8 +96,11 @@ terra draw_board(game : &Game)
   draw_tiles(game)
 end
 
-terra render_demo(vg : &Game, width : float, height : float, t : float)
-  draw_board(vg)
+
+terra render_demo(game : &Game, width : float, height : float, t : float)
+  var vg = game.vg
+  draw_board(game)
+  [ testlang(vg, t) ]
 end
 
 
@@ -117,6 +132,9 @@ terra main(argc : int, argv : &rawstring)
   var time_offset = C.hp_counter()
   var last : int64
 
+  if load_data(&game) == -1 then
+    error("Failed to load data, make sure the cwd is right'")
+  end
 
   while not C.entry_process_events(&width, &height, &debug, &reset) do
     var now = C.hp_counter()
