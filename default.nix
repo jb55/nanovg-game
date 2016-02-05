@@ -46,6 +46,7 @@ in stdenv.mkDerivation rec {
 
   makeFlags = "PREFIX=$(out)";
 
+  NIX_CFLAGS_COMPILE = "-I${bgfx}/share/bgfx/common";
   INCLUDE_PATH=".;${bgfx}/share/bgfx/common;${buildPaths ";" (f: "${f}/include")}";
 
   meta = with stdenv.lib; {
