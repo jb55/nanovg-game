@@ -26,9 +26,10 @@ stdenv.mkDerivation rec {
   makeFlags = "PREFIX=$(out)";
 
   installPhase = ''
-    mkdir -p $out/{lib,include}
+    mkdir -p $out/{lib,include/nanovg}
     cp libnanovg.a $out/lib
     cp "../src/"* $out/include
+    cp "../src/"* $out/include/nanovg
   '';
 
   buildInputs = [ mesa_glu pkgconfig premake4 glfw3 glew ];
