@@ -150,9 +150,9 @@ int _main_(int argc, char *argv[])
     bgfx::touch(0);
 
     // Use debug font to print information about this example.
-    bgfx::dbgTextClear();
-    bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/20-nanovg");
-    bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: NanoVG is small antialiased vector graphics rendering library.");
+    // bgfx::dbgTextClear();
+    // bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/20-nanovg");
+    // bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: NanoVG is small antialiased vector graphics rendering library.");
 
     nvgBeginFrame(nvg, width, height, 1.0f);
 
