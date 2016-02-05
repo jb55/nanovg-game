@@ -3,18 +3,99 @@
 #include <nanovg/nanovg.h>
 #include <bgfx/bgfx.h>
 // TODO: figure out why INCLUDE_PATH isn't working here
-#include "common/entry/entry.h"
+#include <entry/entry.h>
 #include <bgfx-nanovg/bgfx-nanovg.h>
 
-struct Game {
+struct board {
+  float w, h;
+  float x, y;
+};
+
+struct game {
   NVGcontext *vg;
-  float bx;
-  float by;
+  struct board *board;
   int fontNormal;
 };
 
-void drawBoard(Game *game);
-int loadDemoData(struct NVGcontext* vg, Game* game);
+
+int loadData(struct game *game) {
+	game->fontNormal = nvgCreateFont(game->vg, "sans", "font/roboto-regular.ttf");
+  if (game->fontNormal == -1) {
+    printf("Could not load regular font");
+    return -1;
+  }
+  return 0;
+}
+
+void drawTile(struct game *game, float x, float y, int ts, int n) {
+  auto vg = game->vg;
+  auto bx = game->board->x;
+  auto by = game->board->y;
+
+  float tx = bx + (15 * (x+1)) + (ts * x);
+  float ty = by + (15 * (y+1)) + (ts * y);
+
+  nvgBeginPath(vg);
+
+  nvgRoundedRect(vg, tx, ty, ts, ts, 10);
+  nvgFillColor(vg, nvgRGBA(238, 228, 218, 255));
+  nvgFill(vg);
+
+	nvgFontSize(vg, 24.0f);
+	nvgFontFace(vg, "sans");
+	nvgFillColor(vg, nvgRGBA(0,0,0,255));
+	nvgTextAlign(vg, NVG_ALIGN_LEFT or NVG_ALIGN_MIDDLE);
+  nvgText(vg, 100, 100, "ksdhfasdjhfaslkdjfh", NULL);
+}
+
+void drawTiles(struct game *game) {
+  int ts = 105;
+
+  // TODO: centered
+  for (auto x = 0; x < 4; ++x)
+  for (auto y = 0; y < 4; ++y) {
+    drawTile(game, x, y, ts, 0);
+  }
+}
+
+
+static void
+drawBoard(struct game *game) {
+  auto bw = game->board->w;
+  auto bh = game->board->h;
+  auto bx = game->board->x;
+  auto by = game->board->y;
+  auto vg = game->vg;
+
+  auto bg = nvgLinearGradient(vg, bx, by, bx+bw, by+bh,
+                              nvgRGBA(187,173,160,255),
+                              nvgRGBA(159,147,136,255));
+
+	nvgBeginPath(vg);
+  nvgRoundedRect(vg, bx, by, bw, bh, 20);
+	nvgFillPaint(vg, bg);
+	nvgFill(vg);
+
+  drawTiles(game);
+}
+
+static int
+loadDemoData(struct NVGcontext* vg, struct game* game)
+{
+	game->fontNormal = nvgCreateFont(vg, "sans", "font/roboto-regular.ttf");
+	if (game->fontNormal == -1) {
+    printf("Could not add font italic.\n");
+    return -1;
+  }
+	return 0;
+}
+
+static void
+updateGameBoard(struct board *board, int swidth, int sheight) {
+  board->x = (swidth / 2) - (board->w / 2);
+  board->y = (sheight / 2) - (board->h / 2);
+}
+
 
 int _main_(int argc, char *argv[])
 {
@@ -38,9 +119,13 @@ int _main_(int argc, char *argv[])
 		);
 
 	NVGcontext* nvg = nvgCreate(1, 0);
-  Game game;
-  game.bx = 500;
-  game.by = 500;
+  struct game game;
+  struct board board;
+  board.w = 500;
+  board.h = 500;
+  board.x = board.w / 2;
+  board.y = board.h / 2;
+  game.board = &board;
   game.vg = nvg;
 	bgfx::setViewSeq(0, true);
 
@@ -51,6 +136,8 @@ int _main_(int argc, char *argv[])
 	entry::MouseState mouseState;
 	while (!entry::processEvents(width, height, debug, reset, &mouseState) )
 	{
+    updateGameBoard(&board, width, height);
+
 		int64_t now = bx::getHPCounter();
 		const double freq = double(bx::getHPFrequency() );
 		// float time = (float)( (now-timeOffset)/freq);
@@ -83,76 +170,5 @@ int _main_(int argc, char *argv[])
 	// Shutdown bgfx.
 	bgfx::shutdown();
 
-	return 0;
-
   return 0;
-}
-
-int loadData(Game *game) {
-	game->fontNormal = nvgCreateFont(game->vg, "sans", "font/roboto-regular.ttf");
-  if (game->fontNormal == -1) {
-    printf("Could not load regular font");
-    return -1;
-  }
-  return 0;
-}
-
-void drawTile(Game *game, float x, float y, int ts, int n) {
-  auto vg = game->vg;
-  auto bx = game->bx;
-  auto by = game->by;
-
-  float tx = bx + (15 * (x+1)) + (ts * x);
-  float ty = by + (15 * (y+1)) + (ts * y);
-
-  nvgBeginPath(vg);
-
-  nvgRoundedRect(vg, tx, ty, ts, ts, 10);
-  nvgFillColor(vg, nvgRGBA(238, 228, 218, 255));
-  nvgFill(vg);
-
-	nvgFontSize(vg, 24.0f);
-	nvgFontFace(vg, "sans");
-	nvgFillColor(vg, nvgRGBA(0,0,0,255));
-	nvgTextAlign(vg, NVG_ALIGN_LEFT or NVG_ALIGN_MIDDLE);
-  nvgText(vg, 100, 100, "ksdhfasdjhfaslkdjfh", NULL);
-}
-
-void drawTiles(Game *game) {
-  int ts = 105;
-
-  // TODO: centered
-  for (auto x = 0; x < 4; ++x)
-  for (auto y = 0; y < 4; ++y) {
-    drawTile(game, x, y, ts, 0);
-  }
-}
-
-
-void drawBoard(Game *game) {
-  int size = 500;
-  auto bx = game->bx;
-  auto by = game->by;
-  auto vg = game->vg;
-
-  auto bg = nvgLinearGradient(vg, bx, by, bx+size, by+size,
-                              nvgRGBA(187,173,160,255),
-                              nvgRGBA(159,147,136,255));
-
-	nvgBeginPath(vg);
-  nvgRoundedRect(vg, bx, by, size, size, 20);
-	nvgFillPaint(vg, bg);
-	nvgFill(vg);
-
-  drawTiles(game);
-}
-
-int loadDemoData(struct NVGcontext* vg, Game* game)
-{
-	game->fontNormal = nvgCreateFont(vg, "sans", "font/roboto-regular.ttf");
-	if (game->fontNormal == -1) {
-    printf("Could not add font italic.\n");
-    return -1;
-  }
-	return 0;
 }
