@@ -3,18 +3,21 @@ LIBS=-lGLEW -lexample-common -lbgfx -lnanogui -lpthread \
      -lGL -lX11 -lglfw -lGLU -lnanovg -lbgfx-nanovg
 
 LINKOPTS = $(LDFLAGS) $(LIBS)
-CFLAGS = -g
+CFLAGS = -g -std=c++11
 
 all: hello nanovg
 
 hello: hello.o
-	$(CC) $(CFLAGS) $< $(LINKOPTS) -o $@
+	$(CXX) $(CFLAGS) $< $(LINKOPTS) -o $@
 
 nanovg: nanovg.o
-	$(CC) $(CFLAGS) $< $(LINKOPTS) -o $@
+	$(CXX) $(CFLAGS) $< $(LINKOPTS) -o $@
 
-%.o: %.t lang/nvg.t
-	terra $^ $(basename $@)
+# %.o: %.t lang/nvg.t
+# 	terra $^ $(basename $@)
+
+%.o: %.cc Makefile
+	$(CXX) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f hello hello.o

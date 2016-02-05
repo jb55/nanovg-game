@@ -46,7 +46,7 @@ in stdenv.mkDerivation rec {
 
   makeFlags = "PREFIX=$(out)";
 
-  INCLUDE_PATH=".;./common;${buildPaths ";" (f: "${f}/include")}";
+  INCLUDE_PATH=".;${bgfx}/share/bgfx/common;${buildPaths ";" (f: "${f}/include")}";
 
   meta = with stdenv.lib; {
     description = "NanoVG game";
