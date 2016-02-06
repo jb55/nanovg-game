@@ -132,7 +132,9 @@ int _main_(int argc, char *argv[])
   game.vg = nvg;
   bgfx::setViewSeq(0, true);
 
-  loadDemoData(nvg, &game);
+  if (loadData(nvg, &game) == -1) {
+    return 1;
+  }
 
   int64_t timeOffset = bx::getHPCounter();
 
