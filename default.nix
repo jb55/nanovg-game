@@ -1,13 +1,13 @@
 { stdenv
 , bgfx
 , bgfx-nanovg
+, bgfx-imgui
 , bx
 , gdb
 , genie
 , glew
 , glfw3
 , glibc
-, imgui
 , mesa_glu
 , nanogui
 , nanovg
@@ -20,13 +20,13 @@
 let buildInputs = with xlibs; [
       bgfx
       bgfx-nanovg
+      bgfx-imgui
       bx
       gdb
       genie
       glew
       glfw3
       glibc
-      imgui
       libX11
       mesa_glu
       nanogui
@@ -57,4 +57,4 @@ in stdenv.mkDerivation rec {
     maintainers = with maintainers; [ jb55 ];
     license = licenses.mit;
   };
-} 
+}

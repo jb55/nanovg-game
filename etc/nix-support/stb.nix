@@ -9,12 +9,12 @@ stdenv.mkDerivation rec {
     owner = "nothings";
     repo = "stb";
     rev = version;
-    sha256 = "0w0r8d2qbcdrx6347irgzkq7p40qhc8wjaa7sawmv2ibq35v3pad";
+    sha256 = "0b7dvi7av0dk0pq5iczxx0f5ba1z1b5yvym6r1cv9dinqwbw6l2i";
   };
 
   installPhase = ''
-    mkdir -p $out/include
-    cp -r * $out/include
+    mkdir -p $out/include/stb
+    cp -r * $out/include/stb
   '';
 
   meta = with stdenv.lib; {

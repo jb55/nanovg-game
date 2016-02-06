@@ -3,16 +3,18 @@
 
 stdenv.mkDerivation rec {
   name = "bgfx-imgui-${version}";
-  version = "1.47";
+  version = "iunno";
 
   src = ../../deps/ocornut-imgui;
 
+  buildInputs = [ stb ];
+
+  # TODO: figure out why Makefile was not working
   buildPhase = ''
-    gcc -O2 -c -o imgui.o imgui.cpp
-    gcc -O2 -c -o imgui_draw.o imgui_draw.cpp
-    gcc -O2 -c -o imgui_demo.o imgui_demo.cpp
-    gcc -O2 -c -o imgui_wm.o imgui_wm.cpp
-    ar rcs libbgfx-imgui.a imgui{_draw,_demo,_wm}.o
+    g++ -O2 -std=c++11 -c -o imgui_draw.o imgui_draw.cpp
+    g++ -O2 -std=c++11 -c -o imgui_demo.o imgui_demo.cpp
+    g++ -O2 -std=c++11 -c -o imgui_wm.o imgui_wm.cpp
+    ar rcs libbgfx-imgui.a imgui_draw.o imgui_demo.o imgui_wm.o
   '';
 
   installPhase = ''
@@ -23,7 +25,7 @@ stdenv.mkDerivation rec {
 
     ln -s $out/include/imgui $out/include/ocornut-imgui
 
-    cp imconfig.h imgui{_internal,_wm}.h stb{,_rect_pack,_textedit,_truetype}.h \
+    cp imconfig.h imgui{,_internal,_wm}.h \
       $out/include/imgui
   '';
 

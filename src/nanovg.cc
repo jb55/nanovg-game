@@ -32,6 +32,7 @@ void drawTile(struct game *game, float x, float y, int ts, int n) {
   auto vg = game->vg;
   auto bx = game->board->x;
   auto by = game->board->y;
+  const char *text = "text";
 
   float tx = bx + (15 * (x+1)) + (ts * x);
   float ty = by + (15 * (y+1)) + (ts * y);
@@ -44,9 +45,8 @@ void drawTile(struct game *game, float x, float y, int ts, int n) {
 
   nvgFontSize(vg, 24.0f);
   nvgFontFace(vg, "sans");
-  nvgFillColor(vg, nvgRGBA(0,0,0,255));
-  nvgTextAlign(vg, NVG_ALIGN_LEFT or NVG_ALIGN_MIDDLE);
-  nvgText(vg, 100, 100, "ksdhfasdjhfaslkdjfh", NULL);
+  nvgFillColor(vg, nvgRGBA(255,255,255,255));
+  nvgText(vg, 100, 100, "this is a game", NULL);
 }
 
 void drawTiles(struct game *game) {
@@ -81,11 +81,11 @@ drawBoard(struct game *game) {
 }
 
 static int
-loadDemoData(struct NVGcontext* vg, struct game* game)
+loadData(struct NVGcontext* vg, struct game* game)
 {
-  game->fontNormal = nvgCreateFont(vg, "sans", "font/roboto-regular.ttf");
+  game->fontNormal = nvgCreateFont(vg, "sans", "font/roboto-bold.ttf");
   if (game->fontNormal == -1) {
-    printf("Could not add font italic.\n");
+    printf("Could not add font normal.\n");
     return -1;
   }
   return 0;
@@ -119,9 +119,10 @@ int _main_(int argc, char *argv[])
     , 0
     );
 
-	imguiCreate();
+  imguiCreate();
 
   NVGcontext* nvg = nvgCreate(1, 0);
+
   struct game game;
   struct board board;
   board.w = 500;
@@ -171,6 +172,7 @@ int _main_(int argc, char *argv[])
   }
 
   nvgDelete(nvg);
+  imguiDestroy();
 
   // Shutdown bgfx.
   bgfx::shutdown();

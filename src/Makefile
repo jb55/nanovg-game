@@ -1,6 +1,7 @@
 
-LIBS=-lGLEW -lexample-common -lbgfx -lnanogui -lpthread \
-     -lGL -lX11 -lglfw -lGLU -lnanovg -lbgfx-nanovg
+LIBS=-lGLEW -lexample-common -lbgfx -lpthread \
+     -lGL -lX11 -lglfw -lGLU -lnanovg -lbgfx-nanovg \
+     -lbgfx-imgui -lnanogui
 
 LINKOPTS = $(LDFLAGS) $(LIBS)
 CFLAGS = -g -std=c++11 -Wno-unused-variable
