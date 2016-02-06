@@ -10,6 +10,7 @@
 struct board {
   float w, h;
   float x, y;
+  int states[16];
 };
 
 struct game {
@@ -32,6 +33,9 @@ void drawTile(struct game *game, float x, float y, int ts, int n) {
   auto vg = game->vg;
   auto bx = game->board->x;
   auto by = game->board->y;
+  float fsize = 58.0f;
+  float txtx = fsize / 4.65f;
+  float txty = fsize / 3.4f;
   char txtbuf[8];
 
   float tx = bx + (15 * (x+1)) + (ts * x);
@@ -44,21 +48,23 @@ void drawTile(struct game *game, float x, float y, int ts, int n) {
   nvgFill(vg);
 
   if (n >= 2) {
-    nvgFontSize(vg, 48.0f);
+    nvgFontSize(vg, fsize);
     nvgFontFace(vg, "sans");
     nvgFillColor(vg, nvgRGBA(119,110,101,255));
     bx::snprintf(txtbuf, sizeof(txtbuf), "%d", n);
-    nvgText(vg, tx + (ts / 2), ty + (ts / 2), txtbuf, NULL);
+    txtx = strlen(txtbuf) * txtx;
+    nvgText(vg, tx + (ts / 2) - txtx, ty + (ts / 2) + txty, txtbuf, NULL);
   }
 }
 
 void drawTiles(struct game *game) {
   int ts = 105;
+  int i = 0;
 
   // TODO: centered
   for (auto x = 0; x < 4; ++x)
   for (auto y = 0; y < 4; ++y) {
-    drawTile(game, x, y, ts, 0);
+    drawTile(game, x, y, ts, game->board->states[i++]);
   }
 }
 
@@ -132,6 +138,9 @@ int _main_(int argc, char *argv[])
   board.h = 500;
   board.x = board.w / 2;
   board.y = board.h / 2;
+  for (int i = 0; i < 16; ++i) {
+    board.states[i] = 2 << i;
+  }
   game.board = &board;
   game.vg = nvg;
   bgfx::setViewSeq(0, true);
