@@ -4,6 +4,7 @@
 #include <bgfx/bgfx.h>
 // TODO: figure out why INCLUDE_PATH isn't working here
 #include <entry/entry.h>
+#include <imgui/imgui.h>
 #include <bgfx-nanovg/bgfx-nanovg.h>
 
 struct board {
@@ -117,6 +118,8 @@ int _main_(int argc, char *argv[])
     , 1.0f
     , 0
     );
+
+	imguiCreate();
 
   NVGcontext* nvg = nvgCreate(1, 0);
   struct game game;

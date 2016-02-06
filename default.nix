@@ -2,17 +2,18 @@
 , bgfx
 , bgfx-nanovg
 , bx
+, gdb
 , genie
-, glibc
 , glew
 , glfw3
+, glibc
+, imgui
 , mesa_glu
-, nanovg
 , nanogui
+, nanovg
 , pkgconfig
 , premake4
 , terra
-, gdb
 , xlibs
 }:
 
@@ -24,9 +25,10 @@ let buildInputs = with xlibs; [
       genie
       glew
       glfw3
+      glibc
+      imgui
       libX11
       mesa_glu
-      glibc
       nanogui
       nanovg
       pkgconfig
