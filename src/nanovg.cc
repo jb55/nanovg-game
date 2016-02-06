@@ -32,7 +32,7 @@ void drawTile(struct game *game, float x, float y, int ts, int n) {
   auto vg = game->vg;
   auto bx = game->board->x;
   auto by = game->board->y;
-  const char *text = "text";
+  char txtbuf[8];
 
   float tx = bx + (15 * (x+1)) + (ts * x);
   float ty = by + (15 * (y+1)) + (ts * y);
@@ -43,10 +43,13 @@ void drawTile(struct game *game, float x, float y, int ts, int n) {
   nvgFillColor(vg, nvgRGBA(238, 228, 218, 255));
   nvgFill(vg);
 
-  nvgFontSize(vg, 24.0f);
-  nvgFontFace(vg, "sans");
-  nvgFillColor(vg, nvgRGBA(255,255,255,255));
-  nvgText(vg, 100, 100, "this is a game", NULL);
+  if (n >= 2) {
+    nvgFontSize(vg, 48.0f);
+    nvgFontFace(vg, "sans");
+    nvgFillColor(vg, nvgRGBA(119,110,101,255));
+    bx::snprintf(txtbuf, sizeof(txtbuf), "%d", n);
+    nvgText(vg, tx + (ts / 2), ty + (ts / 2), txtbuf, NULL);
+  }
 }
 
 void drawTiles(struct game *game) {
