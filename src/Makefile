@@ -3,7 +3,7 @@ LIBS=-lGLEW -lexample-common -lbgfx -lnanogui -lpthread \
      -lGL -lX11 -lglfw -lGLU -lnanovg -lbgfx-nanovg
 
 LINKOPTS = $(LDFLAGS) $(LIBS)
-CFLAGS = -g -std=c++11
+CFLAGS = -g -std=c++11 -Wno-unused-variable
 
 all: hello nanovg
 
