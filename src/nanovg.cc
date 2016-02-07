@@ -22,16 +22,21 @@ struct game {
   int fontNormal;
 };
 
-struct rgb {
+struct color {
   int r, g, b;
 };
 
-static const struct rgb tile_colors[] = {
-  { 238 , 228 , 218 },
-  { 237 , 224 , 200 },
-  { 242 , 177 , 121 },
-  { 245 , 149 , 99  }
+static const struct color tile_colors[] = {
+  { 238, 228, 218 }, // 2
+  { 237, 224, 200 }, // 4
+  { 242, 177, 121 }, // 8
+  { 245, 149, 99 },  // 16
+  { 246, 124, 95 },  // 32
+  { 246, 94,  59 },  // 64
+  { 237, 207, 114 }, // 128
 };
+
+static const struct NVGcolor white = { 1, 1, 1, 1 };
 
 int loadData(struct game *game) {
   game->fontNormal = nvgCreateFont(game->vg, "sans", "font/roboto-regular.ttf");
@@ -42,10 +47,12 @@ int loadData(struct game *game) {
   return 0;
 }
 
-void drawTile(struct game *game, float x, float y, int ts, int n, struct rgb tilec) {
+void drawTile(struct game *game, float x, float y, int ts, int n,
+              const struct color *c) {
   auto vg = game->vg;
   auto bx = game->board->x;
   auto by = game->board->y;
+  NVGcolor txtColor;
   float fsize = 58.0f;
   float txtx = fsize / 4.65f;
   float txty = fsize / 3.4f;
@@ -57,13 +64,14 @@ void drawTile(struct game *game, float x, float y, int ts, int n, struct rgb til
   nvgBeginPath(vg);
 
   nvgRoundedRect(vg, tx, ty, ts, ts, 10);
-  nvgFillColor(vg, nvgRGBA(tilec.r, tilec.g, tilec.b, 255));
+  nvgFillColor(vg, nvgRGBA(c->r, c->g, c->b, 255));
   nvgFill(vg);
 
   if (n >= 2) {
     nvgFontSize(vg, fsize);
     nvgFontFace(vg, "sans");
-    nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
+    txtColor = n <= 4 ? nvgRGBA(119, 110, 101, 255) : white;
+    nvgFillColor(vg, txtColor);
     bx::snprintf(txtbuf, sizeof(txtbuf), "%d", n);
     txtx = strlen(txtbuf) * txtx;
     nvgText(vg, tx + (ts / 2) - txtx, ty + (ts / 2) + txty, txtbuf, NULL);
@@ -78,7 +86,7 @@ void drawTiles(struct game *game) {
   for (auto x = 0; x < 4; ++x)
   for (auto y = 0; y < 4; ++y, ++i) {
     drawTile(game, x, y, ts, game->board->states[i],
-             tile_colors[i % ARRAY_SIZE(tile_colors)]);
+             &tile_colors[i % ARRAY_SIZE(tile_colors)]);
   }
 }
 
