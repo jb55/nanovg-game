@@ -87,9 +87,11 @@ void drawTile(struct game *game, float x, float y, struct tile *tile, float ts,
   float fsize = 58.0f;
   float txtx = fsize / 4.65f;
   float txty = fsize / 3.4f;
+  float mtx = tile ? tile->x : 0;
+  float mty = tile ? tile->y : 0;
 
-  float tx = bx + (15.f * (x+1.f)) + (ts * x) + tile->x;
-  float ty = by + (15.f * (y+1.f)) + (ts * y) + tile->y;
+  float tx = bx + (15.f * (x+1.f)) + (ts * x) + mtx;
+  float ty = by + (15.f * (y+1.f)) + (ts * y) + mty;
 
   nvgBeginPath(vg);
 
@@ -118,12 +120,19 @@ void drawTiles(struct game *game) {
   int state = 0;
   int colorind = 0;
 
+  // draw back tiles first
+  for (int x = 0; x < 4; ++x)
+  for (int y = 0; y < 4; ++y) {
+    drawTile(game, x, y, NULL, ts, state, &tile_colors[0]);
+  }
+
   // TODO: centered
   for (auto x = 0; x < 4; ++x)
   for (auto y = 0; y < 4; ++y, ++i) {
     tile = &game->board->tiles[i];
     state = tile->value;
-    colorind = (i == 0 ? 0 : int(log2(state))) % ARRAY_SIZE(tile_colors);
+    if (state == 0) continue;
+    colorind = int(log2(state)) % ARRAY_SIZE(tile_colors);
     drawTile(game, x, y, tile, ts, state, &tile_colors[colorind]);
   }
 }
