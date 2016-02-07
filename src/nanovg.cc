@@ -7,6 +7,9 @@
 #include <imgui/imgui.h>
 #include <bgfx-nanovg/bgfx-nanovg.h>
 
+// TODO: organize me
+#define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
 struct board {
   float w, h;
   float x, y;
@@ -19,6 +22,16 @@ struct game {
   int fontNormal;
 };
 
+struct rgb {
+  int r, g, b;
+};
+
+static const struct rgb tile_colors[] = {
+  { 238 , 228 , 218 },
+  { 237 , 224 , 200 },
+  { 242 , 177 , 121 },
+  { 245 , 149 , 99  }
+};
 
 int loadData(struct game *game) {
   game->fontNormal = nvgCreateFont(game->vg, "sans", "font/roboto-regular.ttf");
@@ -29,7 +42,7 @@ int loadData(struct game *game) {
   return 0;
 }
 
-void drawTile(struct game *game, float x, float y, int ts, int n) {
+void drawTile(struct game *game, float x, float y, int ts, int n, struct rgb tilec) {
   auto vg = game->vg;
   auto bx = game->board->x;
   auto by = game->board->y;
@@ -44,13 +57,13 @@ void drawTile(struct game *game, float x, float y, int ts, int n) {
   nvgBeginPath(vg);
 
   nvgRoundedRect(vg, tx, ty, ts, ts, 10);
-  nvgFillColor(vg, nvgRGBA(238, 228, 218, 255));
+  nvgFillColor(vg, nvgRGBA(tilec.r, tilec.g, tilec.b, 255));
   nvgFill(vg);
 
   if (n >= 2) {
     nvgFontSize(vg, fsize);
     nvgFontFace(vg, "sans");
-    nvgFillColor(vg, nvgRGBA(119,110,101,255));
+    nvgFillColor(vg, nvgRGBA(0, 0, 0, 255));
     bx::snprintf(txtbuf, sizeof(txtbuf), "%d", n);
     txtx = strlen(txtbuf) * txtx;
     nvgText(vg, tx + (ts / 2) - txtx, ty + (ts / 2) + txty, txtbuf, NULL);
@@ -63,8 +76,9 @@ void drawTiles(struct game *game) {
 
   // TODO: centered
   for (auto x = 0; x < 4; ++x)
-  for (auto y = 0; y < 4; ++y) {
-    drawTile(game, x, y, ts, game->board->states[i++]);
+  for (auto y = 0; y < 4; ++y, ++i) {
+    drawTile(game, x, y, ts, game->board->states[i],
+             tile_colors[i % ARRAY_SIZE(tile_colors)]);
   }
 }
 
