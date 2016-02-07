@@ -14,4 +14,5 @@ let callPackage = pkgs.callPackage;
     };
 in callPackage ./default.nix {
   inherit bgfx bgfx-nanovg bx genie nanovg nanogui bgfx-imgui;
+  stdenv = pkgs.clangStdenv;
 }
