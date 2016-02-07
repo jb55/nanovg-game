@@ -4,11 +4,18 @@
 #include <bgfx/bgfx.h>
 // TODO: figure out why INCLUDE_PATH isn't working here
 #include <entry/entry.h>
+#include <entry/input.h>
 #include <imgui/imgui.h>
+#include <math.h>
 #include <bgfx-nanovg/bgfx-nanovg.h>
 
 // TODO: organize me
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
+
+enum gameState {
+  GAME_IDLE,
+  GAME_ANIMATING
+};
 
 struct board {
   float w, h;
@@ -19,6 +26,7 @@ struct board {
 struct game {
   NVGcontext *vg;
   struct board *board;
+  gameState state;
   int fontNormal;
 };
 
@@ -27,6 +35,7 @@ struct color {
 };
 
 static const struct color tile_colors[] = {
+  { 205, 193, 180 }, // 0
   { 238, 228, 218 }, // 2
   { 237, 224, 200 }, // 4
   { 242, 177, 121 }, // 8
@@ -81,12 +90,15 @@ void drawTile(struct game *game, float x, float y, int ts, int n,
 void drawTiles(struct game *game) {
   int ts = 105;
   int i = 0;
+  int state = 0;
+  int colorind = 0;
 
   // TODO: centered
   for (auto x = 0; x < 4; ++x)
   for (auto y = 0; y < 4; ++y, ++i) {
-    drawTile(game, x, y, ts, game->board->states[i],
-             &tile_colors[i % ARRAY_SIZE(tile_colors)]);
+    state = game->board->states[i];
+    colorind = (i == 0 ? 0 : int(log2(state))) % ARRAY_SIZE(tile_colors);
+    drawTile(game, x, y, ts, state, &tile_colors[colorind]);
   }
 }
 
@@ -128,6 +140,19 @@ updateGameBoard(struct board *board, int swidth, int sheight) {
   board->y = (sheight / 2) - (board->h / 2);
 }
 
+static void
+initGameBoard(struct board *board) {
+  int r = rand() % 15;
+  board->states[r] = 2;
+}
+
+static void
+showStates(struct board *board) {
+  for (int i = 0; i < 16; ++i) {
+    printf("%d ", board->states[i]);
+  }
+  printf("\n");
+}
 
 int _main_(int argc, char *argv[])
 {
@@ -135,6 +160,8 @@ int _main_(int argc, char *argv[])
   uint32_t height = 720;
   uint32_t debug = BGFX_DEBUG_TEXT;
   uint32_t reset = BGFX_RESET_VSYNC;
+
+  srand(time(NULL));
 
   bgfx::init();
   bgfx::reset(width, height, reset);
@@ -160,9 +187,10 @@ int _main_(int argc, char *argv[])
   board.h = 500;
   board.x = board.w / 2;
   board.y = board.h / 2;
-  for (int i = 0; i < 16; ++i) {
-    board.states[i] = 2 << i;
-  }
+
+  for (int i = 0; i < 16; i++)
+    board.states[i] = 0;
+
   game.board = &board;
   game.vg = nvg;
   bgfx::setViewSeq(0, true);
@@ -172,10 +200,14 @@ int _main_(int argc, char *argv[])
   }
 
   int64_t timeOffset = bx::getHPCounter();
+  initGameBoard(&board);
+  showStates(&board);
 
   entry::MouseState mouseState;
   while (!entry::processEvents(width, height, debug, reset, &mouseState) )
   {
+    bool up = inputGetKeyState(entry::Key::Up);
+
     updateGameBoard(&board, width, height);
 
     int64_t now = bx::getHPCounter();
@@ -207,6 +239,7 @@ int _main_(int argc, char *argv[])
 
   nvgDelete(nvg);
   imguiDestroy();
+  showStates(&board);
 
   // Shutdown bgfx.
   bgfx::shutdown();
