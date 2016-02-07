@@ -5,6 +5,7 @@ let callPackage = pkgs.callPackage;
     genie       = callPackage ./etc/nix-support/genie.nix { };
     nanogui     = callPackage ./etc/nix-support/nanogui.nix { inherit nanovg; };
     nanovg      = callPackage ./etc/nix-support/nanovg.nix { };
+    nanosvg     = callPackage ./etc/nix-support/nanosvg.nix { };
     stb         = callPackage ./etc/nix-support/stb.nix { };
     bgfx-nanovg = callPackage ./etc/nix-support/bgfx-nanovg.nix {
       inherit bx bgfx nanovg;
@@ -13,6 +14,6 @@ let callPackage = pkgs.callPackage;
       inherit bx genie; debugBuild = debug;
     };
 in callPackage ./default.nix {
-  inherit bgfx bgfx-nanovg bx genie nanovg nanogui bgfx-imgui;
+  inherit bgfx bgfx-nanovg bx genie nanovg nanogui bgfx-imgui nanosvg;
   stdenv = pkgs.clangStdenv;
 }

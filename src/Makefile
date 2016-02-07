@@ -6,20 +6,23 @@ LIBS=-lGLEW -lexample-common -lbgfx -lpthread \
 LINKOPTS = $(LDFLAGS) $(LIBS)
 CFLAGS = -g -std=c++11 -Wno-unused-variable
 
-all: hello nanovg
+OBJS = nanovg.o nanosvg-test.o
+
+all: nanovg
 
 hello: hello.o
 	$(CXX) $(CFLAGS) $< $(LINKOPTS) -o $@
 
-nanovg: nanovg.o
-	$(CXX) $(CFLAGS) $< $(LINKOPTS) -o $@
+nanovg: $(OBJS)
+	$(CXX) $(CFLAGS) $^ $(LINKOPTS) -o $@
 
 # %.o: %.t lang/nvg.t
 # 	terra $^ $(basename $@)
 
-%.o: %.cc Makefile
+%.o: %.cc
 	$(CXX) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f hello hello.o
-	rm -f nanovg nanovg.o
+	rm -f nanovg
+	rm -f $(OBJS)

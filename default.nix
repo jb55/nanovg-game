@@ -11,6 +11,7 @@
 , mesa_glu
 , nanogui
 , nanovg
+, nanosvg
 , pkgconfig
 , premake4
 , terra
@@ -31,6 +32,7 @@ let buildInputs = with xlibs; [
       mesa_glu
       nanogui
       nanovg
+      nanosvg
       pkgconfig
       premake4
       terra

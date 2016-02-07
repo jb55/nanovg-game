@@ -5,16 +5,19 @@
 // TODO: figure out why INCLUDE_PATH isn't working here
 #include <entry/entry.h>
 #include <entry/input.h>
-// #include <imgui/imgui.h>
+#include <imgui/imgui.h>
 #include <math.h>
 #include <time.h>
 #include <bgfx-nanovg/bgfx-nanovg.h>
+#include <nanosvg/nanosvg.h>
+#include "nanosvg-test.h"
 
 // TODO: organize me
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 struct resources {
   int fontNormal;
+  struct NSVGimage *testSVG;
 };
 
 int loadResources(NVGcontext *nvg, struct resources *res) {
@@ -23,7 +26,18 @@ int loadResources(NVGcontext *nvg, struct resources *res) {
     printf("Could not load regular font");
     return -1;
   }
+
+  res->testSVG = nsvgParseFromFile("23.svg", "px", 96);
+  if (res->testSVG == NULL) {
+    printf("Could not load test.svg");
+    return -1;
+  }
   return 0;
+}
+
+void
+destroyResources(struct resources *res) {
+  nsvgDelete(res->testSVG);
 }
 
 
@@ -83,12 +97,13 @@ int _main_(int argc, char **argv)
     bgfx::touch(0);
 
     // the2048Game();
+    nanosvgTest(nvg, res.testSVG);
 
     bgfx::frame();
   }
 
   nvgDelete(nvg);
-  // imguiDestroy();
+  imguiDestroy();
 
   // Shutdown bgfx.
   bgfx::shutdown();
