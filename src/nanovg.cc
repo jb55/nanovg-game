@@ -18,6 +18,8 @@
 struct resources {
   int fontNormal;
   struct NSVGimage *testSVG;
+  struct NSVGimage *monstercat;
+  struct NSVGimage *firefox;
 };
 
 int loadResources(NVGcontext *nvg, struct resources *res) {
@@ -30,6 +32,18 @@ int loadResources(NVGcontext *nvg, struct resources *res) {
   res->testSVG = nsvgParseFromFile("23.svg", "px", 96);
   if (res->testSVG == NULL) {
     printf("Could not load test.svg");
+    return -1;
+  }
+
+  res->monstercat = nsvgParseFromFile("monstercat.svg", "px", 96);
+  if (res->monstercat == NULL) {
+    printf("Could not load monstercat.svg");
+    return -1;
+  }
+
+  res->firefox = nsvgParseFromFile("firefox.svg", "px", 96);
+  if (res->firefox == NULL) {
+    printf("Could not load firefox.svg");
     return -1;
   }
   return 0;
@@ -48,6 +62,7 @@ int _main_(int argc, char **argv)
   uint32_t height = 720;
   uint32_t debug = BGFX_DEBUG_TEXT;
   uint32_t reset = BGFX_RESET_VSYNC;
+  struct NSVGimage *images[3];
   struct resources res;
   // struct game game;
   // struct board board;
@@ -64,6 +79,7 @@ int _main_(int argc, char **argv)
   bgfx::setViewClear(0
     , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
     , 0x303030ff
+    // , 0xffffffff
     , 1.0f
     , 0
     );
@@ -78,6 +94,10 @@ int _main_(int argc, char **argv)
     return -1;
   }
 
+  images[0] = res.testSVG;
+  images[1] = res.monstercat;
+  images[2] = res.firefox;
+
   bgfx::setViewSeq(0, true);
 
   int64_t timeOffset = bx::getHPCounter();
@@ -87,7 +107,7 @@ int _main_(int argc, char **argv)
   {
     int64_t now = bx::getHPCounter();
     const double freq = double(bx::getHPFrequency() );
-    // float time = (float)( (now-timeOffset)/freq);
+    float time = (float)( (now-timeOffset)/freq);
 
     // Set view 0 default viewport.
     bgfx::setViewRect(0, 0, 0, width, height);
@@ -98,7 +118,7 @@ int _main_(int argc, char **argv)
 
     nvgBeginFrame(nvg, width, height, 1.0f);
 
-    nanosvgTest(nvg, res.testSVG);
+    nanosvgTest(nvg, images, ARRAY_SIZE(images), time);
 
     nvgEndFrame(nvg);
 
