@@ -96,8 +96,13 @@ int _main_(int argc, char **argv)
     // if no other draw calls are submitted to view 0.
     bgfx::touch(0);
 
-    // the2048Game();
+    nvgBeginFrame(nvg, width, height, 1.0f);
+
     nanosvgTest(nvg, res.testSVG);
+
+    nvgEndFrame(nvg);
+
+    // the2048Game();
 
     bgfx::frame();
   }
