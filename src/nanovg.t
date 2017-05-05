@@ -71,7 +71,7 @@ struct Game {
 
 terra load_data(game : &Game) : int
   var vg = game.vg;
-	game.font_normal = C.nvgCreateFont(vg, "sans", "runtime/font/roboto-regular.ttf");
+  game.font_normal = C.nvgCreateFont(vg, "sans", "runtime/font/roboto-regular.ttf");
   if game.font_normal == -1 then
     C.printf("Could not load regular font\n")
     return -1
@@ -95,11 +95,11 @@ terra draw_tile(game : &Game, x : float, y : float, ts : int, n : int)
   C.nvgFillColor(vg, [rgb(238, 228, 218, 255)]);
   C.nvgFill(vg);
 
-	--C.nvgFontSize(vg, 24.0f);
-	--C.nvgFontFaceId(vg, game.font_normal);
-	--C.nvgFontFace(vg, "sans");
+  --C.nvgFontSize(vg, 24.0f);
+  --C.nvgFontFaceId(vg, game.font_normal);
+  --C.nvgFontFace(vg, "sans");
   --C.nvgFillColor(vg, C.nvgRGBA(0,0,0,255));
-	--C.nvgTextAlign(vg, C.NVG_ALIGN_LEFT or C.NVG_ALIGN_MIDDLE);
+  --C.nvgTextAlign(vg, C.NVG_ALIGN_LEFT or C.NVG_ALIGN_MIDDLE);
   --C.nvgText(vg, 10, 10, "a", nil);
 
 end
@@ -125,11 +125,11 @@ terra draw_board(game : &Game)
                                C.nvgRGBA(187,173,160,255),
                                C.nvgRGBA(159,147,136,255));
 
-	C.nvgBeginPath(vg);
+  C.nvgBeginPath(vg);
   -- TODO: centered
-	C.nvgRoundedRect(vg, bx, by, size, size, 20);
-	C.nvgFillPaint(vg, bg);
-	C.nvgFill(vg);
+  C.nvgRoundedRect(vg, bx, by, size, size, 20);
+  C.nvgFillPaint(vg, bg);
+  C.nvgFill(vg);
 
   draw_tiles(game)
 end
@@ -168,8 +168,8 @@ terra main(argc : int, argv : &rawstring)
     , 0
     )
 
-	var nvg : &C.NVGcontext = C.nvgCreate(1, 0)
-	C.bgfx_set_view_seq(0, true)
+  var nvg : &C.NVGcontext = C.nvgCreate(1, 0)
+  C.bgfx_set_view_seq(0, true)
   game.vg = nvg
 
   var time_offset = C.hp_counter()
@@ -181,7 +181,7 @@ terra main(argc : int, argv : &rawstring)
 
   while not C.entry_process_events(&width, &height, &debug, &reset) do
     var now = C.hp_counter()
-		var frameTime : int64 = now - last
+    var frameTime : int64 = now - last
     last = now
     var freq : double = C.hp_frequency()
     var time : float = (now - time_offset) / freq
@@ -202,18 +202,18 @@ terra main(argc : int, argv : &rawstring)
     C.bgfx_dbg_text_printf(0, 2, 0x6f, "Description: NanoVG is small antialiased vector graphics rendering library.")
     C.bgfx_dbg_text_printf(0, 3, 0x2f, "frame time: %f", frameTime)
 
-		C.nvgBeginFrame(nvg, width, height, 1.0)
+    C.nvgBeginFrame(nvg, width, height, 1.0)
 
     render_demo(&game, width, height, time)
 
-		C.nvgEndFrame(nvg);
+    C.nvgEndFrame(nvg);
 
     -- Advance to next frame. Rendering thread will be kicked to
     -- process submitted rendering primitives.
     C.bgfx_frame()
   end
 
-	C.nvgDelete(nvg);
+  C.nvgDelete(nvg);
 
   C.bgfx_shutdown()
 
