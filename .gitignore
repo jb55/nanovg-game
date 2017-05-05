@@ -1,1 +1,5 @@
 *.o
+*.to
+*.ll
+*.s
+nanovg-terra
