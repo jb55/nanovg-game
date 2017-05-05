@@ -6,14 +6,14 @@
 , xlibs
 , fetchFromGitHub
 , bx
-, debugBuild ? false
+, debug ? false
 , withImgui ? false
 }:
 
 let capitalize = with stdenv.lib.strings; with stdenv.lib;
                    str: let cs = stringToCharacters str;
                         in concatStrings (singleton (toUpper (head cs)) ++ tail cs);
-    buildType = if debugBuild then "debug" else "release";
+    buildType = if debug then "debug" else "release";
     buildTypeC = capitalize buildType;
 
 in stdenv.mkDerivation rec {
@@ -80,6 +80,8 @@ in stdenv.mkDerivation rec {
   '';
 
   buildInputs = [ xlibs.libX11 flex bison mesa bx ];
+
+  dontStrip = debug;
 
   meta = with stdenv.lib; {
     description = "Rendering library";

@@ -17,7 +17,40 @@ function testlang(nvg, t)
   return done
 end
 
-local testmacro = macro(testlang)
+white = `C.nvgRGBA(255.0, 255.0, 255.0, 255.0)
+
+function target(nvg, x, y, r)
+  import "lang/nvg"
+  ctx nvg
+  beginpath
+  circle x y r
+  fillcolor (rgba 255 0 0 255)
+  fill
+  local r2 = `r * 0.75f
+  beginpath
+  circle x y r2
+  fillcolor (rgba 255 255 255 255)
+  fill
+  local r3 = `r * 0.5f
+  beginpath
+  circle x y r3
+  fillcolor (rgba 255 0 0 255)
+  fill
+  local r4 = `r * 0.25f
+  beginpath
+  circle x y r4
+  fillcolor white
+  fill
+  return done
+end
+
+terra target_game(nvg : &C.NVGcontext, game : &Game, t : float)
+  var c = 2.0f
+  var r = C.abs(C.cosf(t) * 100f + 50f);
+  var x = C.abs(C.cosf(t) * game.width / c + game.width / (c*2.0))
+  var y = C.abs(C.sinf(t) * game.height / c + game.height / (c*2.0))
+  [ target(nvg, x, y, r) ]
+end
 
 -- 500 x 500
 -- 15 pix spacing
@@ -31,16 +64,20 @@ struct Game {
   vg : &C.NVGcontext;
   bx : float;
   by : float;
+  width : float;
+  height : float;
   font_normal : int;
 }
 
 terra load_data(game : &Game) : int
   var vg = game.vg;
-	game.font_normal = C.nvgCreateFont(vg, "sans", "font/roboto-regular.ttf");
+	game.font_normal = C.nvgCreateFont(vg, "sans", "runtime/font/roboto-regular.ttf");
   if game.font_normal == -1 then
-    C.printf("Could not load regular font")
+    C.printf("Could not load regular font\n")
     return -1
   end
+  C.printf("Loaded font with index: %d\n", game.font_normal)
+  return 1
 end
 
 terra draw_tile(game : &Game, x : float, y : float, ts : int, n : int)
@@ -58,11 +95,12 @@ terra draw_tile(game : &Game, x : float, y : float, ts : int, n : int)
   C.nvgFillColor(vg, [rgb(238, 228, 218, 255)]);
   C.nvgFill(vg);
 
-	C.nvgFontSize(vg, 24.0f);
-	C.nvgFontFace(vg, "sans");
-	C.nvgFillColor(vg, [rgb(0,0,0,255)]);
-	C.nvgTextAlign(vg, C.NVG_ALIGN_LEFT or C.NVG_ALIGN_MIDDLE);
-  C.nvgText(vg, 100, 100, "ksdhfasdjhfaslkdjfh", nil);
+	--C.nvgFontSize(vg, 24.0f);
+	--C.nvgFontFaceId(vg, game.font_normal);
+	--C.nvgFontFace(vg, "sans");
+  --C.nvgFillColor(vg, C.nvgRGBA(0,0,0,255));
+	--C.nvgTextAlign(vg, C.NVG_ALIGN_LEFT or C.NVG_ALIGN_MIDDLE);
+  --C.nvgText(vg, 10, 10, "a", nil);
 
 end
 
@@ -100,9 +138,14 @@ end
 terra render_demo(game : &Game, width : float, height : float, t : float)
   var vg = game.vg
   draw_board(game)
-  [ testlang(vg, t) ]
+  --[ testlang(vg, t) ]
+  target_game(vg, game, t)
 end
 
+terra errors(err : rawstring)
+  C.printf("%s\n", err)
+  C.exit(1)
+end
 
 terra main(argc : int, argv : &rawstring)
   var width : uint32 = 1280
@@ -133,7 +176,7 @@ terra main(argc : int, argv : &rawstring)
   var last : int64
 
   if load_data(&game) == -1 then
-    error("Failed to load data, make sure the cwd is right'")
+    errors("Failed to load data, make sure the cwd is right")
   end
 
   while not C.entry_process_events(&width, &height, &debug, &reset) do
@@ -146,6 +189,8 @@ terra main(argc : int, argv : &rawstring)
 
     -- Set view 0 default viewport.
     C.bgfx_set_view_rect(0, 0, 0, width, height)
+    game.width = width;
+    game.height = height;
 
     -- This dummy draw call is here to make sure that view 0 is cleared
     -- if no other draw calls are submitted to view 0.
@@ -174,4 +219,6 @@ terra main(argc : int, argv : &rawstring)
 
 end
 
-terralib.saveobj("nanovg.o", {_main_ = main})
+terralib.saveobj("nanovg.to", "object", {_main_ = main})
+terralib.saveobj("nanovg.ll", {_main_ = main})
+terralib.saveobj("nanovg.s", {_main_ = main})

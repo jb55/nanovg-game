@@ -1,5 +1,5 @@
 
-require 'c'
+local C = require 'c'
 
 terra max(a : uint16, b : uint16) : uint16
 	if a < b then return b else return a end

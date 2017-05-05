@@ -118,8 +118,6 @@ int _main_(int argc, char **argv)
 
     nvgBeginFrame(nvg, width, height, 1.0f);
 
-    nanosvgTest(nvg, images, ARRAY_SIZE(images), time);
-
     nvgEndFrame(nvg);
 
     // the2048Game();

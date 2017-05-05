@@ -5,6 +5,7 @@
 #define NANOSVG_IMPLEMENTATION
 #include <nanosvg/nanosvg.h>
 #include <nanovg/nanovg.h>
+#include <assert.h>
 #include <bgfx/bgfx.h>
 #include <stddef.h>
 
@@ -24,6 +25,9 @@ void nvgSVGLinearGrad(struct NVGcontext *vg, struct NSVGgradient *grad) {
 }
 
 void nvgDrawSVG(struct NVGcontext *vg, struct NSVGimage *image) {
+  int gotFill = 0;
+  int gotStroke = 0;
+
   for (auto shape = image->shapes; shape != NULL; shape = shape->next) {
 
     nvgBeginPath(vg);
@@ -46,37 +50,34 @@ void nvgDrawSVG(struct NVGcontext *vg, struct NSVGimage *image) {
         } else if (shape->fill.type == NSVG_PAINT_LINEAR_GRADIENT) {
           nvgSVGLinearGrad(vg, shape->fill.gradient);
         }
-        if (shape->fill.type != NSVG_PAINT_NONE)
+        if (shape->fill.type != NSVG_PAINT_NONE) {
           nvgFill(vg);
+          gotFill |= 1;
+        }
       }
       if (shape->stroke.type != NSVG_PAINT_NONE) {
         nvgStroke(vg);
+        gotStroke |= 1;
       }
     }
   }
+
+  assert(gotStroke || gotFill);
+  nvgStroke(vg);
 }
 
 
 void nanosvgTest(struct NVGcontext *vg, struct NSVGimage **image, int n, float t) {
   float mat[6] = {0};
-  float scale = cosf(t) + 1.f;
-  // nvgMoveTo(vg, 500, 500);
-  // nvgTransformRotate(mat, t / 1.f);
-  nvgScale(vg, scale, scale);
-  // nvgDrawSVG(vg, image[1]);
+  float scale = cosf(t) * 100.0f;
 
-  // nvgDrawSVG(vg, image[0]);
-  // nvgReset(vg);
+  nvgTranslate(vg, scale, 0.0f);
   nvgDrawSVG(vg, image[0]);
-  // nvgMoveTo(vg, sin(t * 300), 500);
-  // nvgDrawSVG(vg, image[0]);
 
-  // nvgReset(vg);
-
-  // nvgBeginPath(vg);
-  // nvgStrokeWidth(vg, 100);
-  // nvgStrokeColor(vg, nvgRGB(255, 255, 255));
-  // nvgLineTo(vg, 500, 500);
-  // nvgStroke(vg);
+  nvgBeginPath(vg);
+  nvgStrokeWidth(vg, 100);
+  nvgStrokeColor(vg, nvgRGB(255, 255, 255));
+  nvgLineTo(vg, 500, 500);
+  nvgStroke(vg);
 
 }

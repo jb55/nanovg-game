@@ -5,13 +5,24 @@ local ctxerr = function()
   error("nvg context not bound, use: 'ctx nvg'")
 end
 
+local resolve = function(expr, env)
+  if type(expr) == "function" then
+    return expr(env)
+  end
+  return expr
+end
+
+
 local parseCircle = function(self, lex)
   local x = lex:luaexpr()
   local y = lex:luaexpr()
   local r = lex:luaexpr()
   return function (ctx, env)
     if not ctx then ctxerr() end
-    return `C.nvgCircle([ctx], [x(env)], [y(env)], [r(env)])
+    return `C.nvgCircle([ctx]
+      , [ resolve(x, env) ]
+      , [ resolve(y, env) ]
+      , [ resolve(r, env) ])
   end
 end
 
@@ -22,7 +33,12 @@ local function parseRGBA(self, lex)
   local a = lex:luaexpr()
   return function (ctx, env)
     if not ctx then ctxerr() end
-    return `C.nvgRGBA([r(env)], [g(env)], [b(env)], [a(env)])
+    return `C.nvgRGBA(
+          [ resolve(r, env) ]
+        , [ resolve(g, env) ]
+        , [ resolve(b, env) ]
+        , [ resolve(a, env) ]
+        )
   end
 end
 
@@ -40,6 +56,13 @@ local function parseGeneric(self, lex, expr)
   end
 end
 
+local function parseCall(self, lex)
+  local expr = lex:luaexpr()
+  return function (ctx, env)
+    return expr(env)
+  end
+end
+
 local statement = function(self, lex)
   local exprfn
   local ctxname
@@ -54,6 +77,8 @@ local statement = function(self, lex)
     exprfn = parseGeneric(self, lex, `C.nvgFill)
   elseif lex:nextif("beginpath") then
     exprfn = parseGeneric(self, lex, `C.nvgBeginPath)
+  elseif lex:nextif("call") then
+    exprfn = parseCall(self, lex)
   end
   return function (envfn)
     local env = envfn()
@@ -95,7 +120,7 @@ end
 local nvglang = {
   name = "nvglang"; --name for debugging
   -- list of keywords that will start our expressions
-  entrypoints = {"done", "ctx", "circle", "fill", "fillcolor", "beginpath", "rgba"}; --list of keywords specific to this language
+  entrypoints = {"done", "call", "ctx", "circle", "fill", "fillcolor", "beginpath", "rgba"}; --list of keywords specific to this language
   keywords = {"akeyword"}; --list of keywords specific to this language
    --called by Terra parser to enter this language
   expression = expression;

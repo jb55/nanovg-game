@@ -5,8 +5,12 @@
 , pkgconfig
 , mesa_glu
 , glew
+, debug
 }:
 
+let
+  config = if debug then "debug" else "release";
+in
 stdenv.mkDerivation rec {
   name = "nanovg-git-${version}";
   version = "2015-10-25";
@@ -23,7 +27,7 @@ stdenv.mkDerivation rec {
     cd build
   '';
 
-  makeFlags = "PREFIX=$(out)";
+  makeFlags = [ "PREFIX=$(out)" "config=${config}" ];
 
   installPhase = ''
     mkdir -p $out/{lib,include/nanovg}
@@ -33,6 +37,8 @@ stdenv.mkDerivation rec {
   '';
 
   buildInputs = [ mesa_glu pkgconfig premake4 glfw3 glew ];
+
+  dontStrip = debug;
 
   meta = with stdenv.lib; {
     description = "nanovg";
