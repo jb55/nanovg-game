@@ -6,6 +6,7 @@
 #include <entry/entry.h>
 #include <entry/input.h>
 #include <imgui/imgui.h>
+#include <unistd.h>
 #include <math.h>
 #include <time.h>
 #include <bgfx-nanovg/bgfx-nanovg.h>
@@ -35,9 +36,9 @@ int loadResources(NVGcontext *nvg, struct resources *res) {
     return -1;
   }
 
-  res->monstercat = nsvgParseFromFile("monstercat.svg", "px", 96);
+  res->monstercat = nsvgParseFromFile("wolf.svg", "px", 96);
   if (res->monstercat == NULL) {
-    printf("Could not load monstercat.svg");
+    printf("Could not load wolf.svg");
     return -1;
   }
 
@@ -66,6 +67,8 @@ int _main_(int argc, char **argv)
   struct resources res;
   // struct game game;
   // struct board board;
+
+  chdir("runtime");
 
   srand(time(NULL));
 
@@ -121,6 +124,7 @@ int _main_(int argc, char **argv)
     nvgEndFrame(nvg);
 
     // the2048Game();
+    nanosvgTest(nvg, images[1], time);
 
     bgfx::frame();
   }

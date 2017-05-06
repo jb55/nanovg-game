@@ -3,35 +3,22 @@ LIBS=-lGLEW -lexample-common -lbgfx -lpthread -lGL -lX11 -lglfw -lGLU -lnanovg -
 
 LINKOPTS = $(LDFLAGS) $(LIBS)
 TFLAGS = -g
-CFLAGS = -g -std=c++11 -Wno-unused-variable -O0
+CXXFLAGS = -g -std=c++11 -Wno-unused-variable -O0
+CFLAGS = -g -Wno-unused-variable -O0
 
-OBJS = src/nanovg.o src/nanosvg-test.o
+OBJS = src/nanovg.o src/nanosvg.o
+TOBJS = src/nanovg.to
 
-TOBJS = src/nanovg-terra
-
-all: nanovg-terra
-
-hello: src/hello.o
-	$(CXX) $(CFLAGS) $< $(LINKOPTS) -o $@
+all: nanovg
 
 nanovg: $(OBJS)
 	$(CXX) $(CFLAGS) $^ $(LINKOPTS) -o $@
 
-# %.o: %.t lang/nvg.t
-# 	terra $^ $(basename $@)
-
-# src/nanovg-terra.o: src/nanovg.t
-# 	cd src && terra -g nanovg.t
-# 	mv src/nanovg.o src/nanovg-terra.o
-
-nanovg-terra: src/nanovg.to
-	$(CXX) $(CFLAGS) $< $(LINKOPTS) -o $@
-
-%.to: %.t src/lang/nvg.t
-	cd src && terra $(TFLAGS) $(subst src/,,$<)
+TAGS:
+	etags -o - src/*.cc > $@
 
 %.o: %.cc
-	$(CXX) $(CFLAGS) -c $< -o $@
+	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
 	rm -f hello hello.o
@@ -39,3 +26,15 @@ clean:
 	rm -f src/*.to
 	rm -f nanovg{,-terra}
 	rm -f $(OBJS)
+
+# terra stuff
+
+nanovg-terra: $(OBJS) $(TOBJS)
+	$(CXX) $(CFLAGS) $^ $(LINKOPTS) -o $@
+
+%.to: %.t src/lang/nvg.t
+	cd src && terra $(TFLAGS) $(subst src/,,$<)
+
+# ^ terra stuff
+
+.PHONY: TAGS

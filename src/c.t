@@ -5,6 +5,8 @@ local C = terralib.includecstring [[
   #include <stdio.h>
   #include "logo.h"
   #include <nanovg.h>
+  #include <nanosvg/nanosvg.h>
+  #include "nanosvg-draw.h"
   #include <math.h>
   #include <hp-counter/hp-counter.h>
   #include <bgfx-nanovg/bgfx-nanovg.h>

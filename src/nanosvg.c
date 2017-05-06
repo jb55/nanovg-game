@@ -6,8 +6,7 @@
 #include <nanosvg/nanosvg.h>
 #include <nanovg/nanovg.h>
 #include <assert.h>
-#include <bgfx/bgfx.h>
-#include <stddef.h>
+#include <stdint.h>
 
 NVGcolor nvgColorU32(uint32_t color) {
   return nvgRGB(color & 0xFF, (color >> 8) & 0xFF, (color >> 16) & 0xFF);
@@ -18,8 +17,8 @@ void nvgSVGLinearGrad(struct NVGcontext *vg, struct NSVGgradient *grad) {
   float sy = grad->xform[5];
   float ex = sx + grad->xform[2];
   float ey = sy + grad->xform[3];
-  auto cs = nvgColorU32(grad->stops[0].color);
-  auto ce = nvgColorU32(grad->stops[1].color);
+  NVGcolor cs = nvgColorU32(grad->stops[0].color);
+  NVGcolor ce = nvgColorU32(grad->stops[1].color);
 
   nvgLinearGradient(vg, sx, sy, ex, ey, cs, ce);
 }
@@ -28,8 +27,7 @@ void nvgDrawSVG(struct NVGcontext *vg, struct NSVGimage *image) {
   int gotFill = 0;
   int gotStroke = 0;
 
-  for (auto shape = image->shapes; shape != NULL; shape = shape->next) {
-
+  for (NSVGshape *shape = image->shapes; shape != NULL; shape = shape->next) {
     nvgBeginPath(vg);
     nvgStrokeWidth(vg, shape->strokeWidth);
     uint32_t color = shape->stroke.color;
@@ -37,7 +35,7 @@ void nvgDrawSVG(struct NVGcontext *vg, struct NSVGimage *image) {
     // nvgStrokeColor(vg, nvgRGBA(255, 255, 255, 0));
     nvgStrokeColor(vg, ncolor);
 
-    for (auto path = shape->paths; path != NULL; path = path->next) {
+    for (NSVGpath *path = shape->paths; path != NULL; path = path->next) {
       nvgMoveTo(vg, path->pts[0], path->pts[1]);
       for (int i = 0; i < path->npts-1; i += 3) {
         float* p = &path->pts[i*2];
@@ -63,24 +61,8 @@ void nvgDrawSVG(struct NVGcontext *vg, struct NSVGimage *image) {
   }
 
   assert(gotStroke || gotFill);
-  nvgStroke(vg);
+  //nvgStroke(vg);
 }
 
 
-void nanosvgTest(struct NVGcontext *vg, struct NSVGimage *image, float t) {
-  //float mat[6] = {0};
-  float scale = cosf(t) * 100.0f;
 
-  nvgSave(vg);
-  nvgTranslate(vg, scale, 0.02f);
-  nvgDrawSVG(vg, image);
-  nvgRestore(vg);
-
-  nvgBeginPath(vg);
-  nvgMoveTo(vg, 0, 0);
-  nvgStrokeWidth(vg, 10);
-  nvgStrokeColor(vg, nvgRGBA(255, 255, 255, 255));
-  nvgLineTo(vg, 500, 500);
-  nvgStroke(vg);
-
-}

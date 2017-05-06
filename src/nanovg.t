@@ -11,8 +11,8 @@ function testlang(nvg, t)
   ctx nvg
   beginpath
   local x = `C.cosf(t * 2f) * 100f
-  circle x 100 200
-  fillcolor rgba 255 255 255 255
+  circle 10 100 200
+  fillcolor (rgba 255 255 255 255)
   fill
   return done
 end
@@ -29,7 +29,7 @@ function target(nvg, x, y, r)
   local r2 = `r * 0.75f
   beginpath
   circle x y r2
-  fillcolor (rgba 255 255 255 255)
+  fillcolor white
   fill
   local r3 = `r * 0.5f
   beginpath
@@ -44,12 +44,26 @@ function target(nvg, x, y, r)
   return done
 end
 
+function sumtest()
+  import "lang/sum"
+  sum 1, 2, 3
+  done
+end
+
+terra target_game2(nvg : &C.NVGcontext, game : &Game, t : float)
+  var x = 2.0f;
+  [ sumtest() ];
+end
+
+
 terra target_game(nvg : &C.NVGcontext, game : &Game, t : float)
   var c = 2.0f
   var r = C.abs(C.cosf(t) * 100f + 50f);
   var x = C.abs(C.cosf(t) * game.width / c + game.width / (c*2.0))
   var y = C.abs(C.sinf(t) * game.height / c + game.height / (c*2.0))
   [ target(nvg, x, y, r) ]
+  [ target(nvg, `x * 2.0, y, r) ]
+  [ testlang(nvg, t)]
 end
 
 -- 500 x 500
@@ -62,6 +76,7 @@ end
 
 struct Game {
   vg : &C.NVGcontext;
+  test_svg : &C.NSVGimage;
   bx : float;
   by : float;
   width : float;
@@ -72,10 +87,15 @@ struct Game {
 terra load_data(game : &Game) : int
   var vg = game.vg;
   game.font_normal = C.nvgCreateFont(vg, "sans", "runtime/font/roboto-regular.ttf");
+  -- game.test_svg = C.nsvgParseFromFile("runtime/23.svg", "px", 96)
   if game.font_normal == -1 then
     C.printf("Could not load regular font\n")
     return -1
   end
+  -- if game.test_svg == nil then
+  --   C.printf("Could not load 23.svg\n")
+  --   return -1
+  -- end
   C.printf("Loaded font with index: %d\n", game.font_normal)
   return 1
 end
@@ -134,12 +154,14 @@ terra draw_board(game : &Game)
   draw_tiles(game)
 end
 
-
 terra render_demo(game : &Game, width : float, height : float, t : float)
   var vg = game.vg
   draw_board(game)
-  --[ testlang(vg, t) ]
+  -- var svg = game.test_svg
+  -- [ svgTest(vg, t, svg) ]
   target_game(vg, game, t)
+  target_game2(vg, game, t)
+  --[ testlang(vg, t) ]
 end
 
 terra errors(err : rawstring)
@@ -220,5 +242,5 @@ terra main(argc : int, argv : &rawstring)
 end
 
 terralib.saveobj("nanovg.to", "object", {_main_ = main})
-terralib.saveobj("nanovg.ll", {_main_ = main})
-terralib.saveobj("nanovg.s", {_main_ = main})
+-- terralib.saveobj("nanovg.ll", {_main_ = main})
+-- terralib.saveobj("nanovg.s", {_main_ = main})

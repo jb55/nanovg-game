@@ -77,6 +77,35 @@ local statement = function(self, lex)
     exprfn = parseGeneric(self, lex, `C.nvgFill)
   elseif lex:nextif("beginpath") then
     exprfn = parseGeneric(self, lex, `C.nvgBeginPath)
+  elseif lex:nextif("stroke") then
+    exprfn = parseGeneric(self, lex, `C.nvgStroke)
+  elseif lex:nextif("strokewidth") then
+    local w = lex:luaexpr()
+    exprfn = function (ctx, env)
+      return `C.nvgStrokeWidth([ctx], [ resolve(w, env) ])
+    end
+  elseif lex:nextif("translate") then
+    local x = lex:luaexpr()
+    local y = lex:luaexpr()
+    exprfn = function (ctx, env)
+      return `C.nvgTranslate([ctx], [ resolve(x, env) ], [ resolve(y, env) ])
+    end
+  elseif lex:nextif("strokecolor") then
+    local color = lex:luaexpr()
+    exprfn = function (ctx, env)
+      return `C.nvgStrokeColor([ctx], [ resolve(color, env) ])
+    end
+  elseif lex:nextif("lineto") then
+    local x = lex:luaexpr()
+    local y = lex:luaexpr()
+    exprfn = function (ctx, env)
+      return `C.nvgLineTo([ctx], [ resolve(x, env) ], [ resolve(y, env) ] )
+    end
+  elseif lex:nextif("svg") then
+    local img = lex:luaexpr()
+    exprfn = function (ctx, env)
+      return `C.nvgDrawSVG([ctx], [ resolve(img, env) ])
+    end
   elseif lex:nextif("call") then
     exprfn = parseCall(self, lex)
   end
@@ -85,8 +114,10 @@ local statement = function(self, lex)
     local ctx
     if not ctxname and self.ctx then
       ctx = self.ctx
+      assert(ctx)
     else
       ctx = env[ctxname]
+      assert(ctx)
       self.ctx = ctx
     end
     if exprfn then
@@ -120,7 +151,22 @@ end
 local nvglang = {
   name = "nvglang"; --name for debugging
   -- list of keywords that will start our expressions
-  entrypoints = {"done", "call", "ctx", "circle", "fill", "fillcolor", "beginpath", "rgba"}; --list of keywords specific to this language
+  entrypoints = {
+      "done"
+    , "beginpath"
+    , "call"
+    , "circle"
+    , "ctx"
+    , "fill"
+    , "fillcolor"
+    , "lineto"
+    , "rgba"
+    , "stroke"
+    , "strokecolor"
+    , "strokewidth"
+    , "svg"
+    , "translate"
+  }; --list of keywords specific to this language
   keywords = {"akeyword"}; --list of keywords specific to this language
    --called by Terra parser to enter this language
   expression = expression;
