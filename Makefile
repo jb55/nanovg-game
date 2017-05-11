@@ -6,7 +6,12 @@ TFLAGS = -g
 CXXFLAGS = -g -std=c++11 -Wno-unused-variable -O0
 CFLAGS = -g -Wno-unused-variable -O0
 
-OBJS = src/nanovg.o src/nanosvg.o
+OBJS = src/nanovg.o \
+       src/nanosvg.o \
+       src/game.o \
+       src/logging.o \
+       src/entity.o
+
 TOBJS = src/nanovg.to
 
 all: nanovg
@@ -19,6 +24,9 @@ TAGS:
 
 %.o: %.cc
 	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
 	rm -f hello hello.o

@@ -5,13 +5,15 @@
 // TODO: figure out why INCLUDE_PATH isn't working here
 #include <entry/entry.h>
 #include <entry/input.h>
-#include <imgui/imgui.h>
+// #include <imgui/imgui.h>
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
 #include <bgfx-nanovg/bgfx-nanovg.h>
 #include <nanosvg/nanosvg.h>
 #include "nanosvg-test.h"
+#include "logging.h"
+#include "game.h"
 
 // TODO: organize me
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
@@ -58,6 +60,8 @@ destroyResources(struct resources *res) {
 
 int _main_(int argc, char **argv)
 {
+  struct game game;
+  int setup = 0;
   char txtbuf[256];
   uint32_t width = 1280;
   uint32_t height = 720;
@@ -68,9 +72,11 @@ int _main_(int argc, char **argv)
   // struct game game;
   // struct board board;
 
+  game_init(&game);
   chdir("runtime");
 
-  srand(time(NULL));
+  // srand(time(NULL));
+  srand(42);
 
   bgfx::init();
   bgfx::reset(width, height, reset);
@@ -81,7 +87,7 @@ int _main_(int argc, char **argv)
   // Set view 0 clear state.
   bgfx::setViewClear(0
     , BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-    , 0x303030ff
+    , 0x909090ff
     // , 0xffffffff
     , 1.0f
     , 0
@@ -89,7 +95,7 @@ int _main_(int argc, char **argv)
 
   // imguiCreate();
 
-  NVGcontext* nvg = nvgCreate(1, 0);
+  nvg = nvgCreate(1, 0);
   // if (initGame(&game, &board, nvg) == -1) {
   //   return 1;
   // }
@@ -111,6 +117,14 @@ int _main_(int argc, char **argv)
     int64_t now = bx::getHPCounter();
     const double freq = double(bx::getHPFrequency() );
     float time = (float)( (now-timeOffset)/freq);
+    game.time = time;
+    game.width = width;
+    game.height = height;
+
+    if (!setup) {
+      game_setup(&game);
+      setup = 1;
+    }
 
     // Set view 0 default viewport.
     bgfx::setViewRect(0, 0, 0, width, height);
@@ -121,19 +135,21 @@ int _main_(int argc, char **argv)
 
     nvgBeginFrame(nvg, width, height, 1.0f);
 
+    game_render(&game);
+
     nvgEndFrame(nvg);
 
     // the2048Game();
-    nanosvgTest(nvg, images[1], time);
 
     bgfx::frame();
   }
 
   nvgDelete(nvg);
-  imguiDestroy();
+  // imguiDestroy();
 
   // Shutdown bgfx.
   bgfx::shutdown();
+  game_free(&game);
 
   return 0;
 }

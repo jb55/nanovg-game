@@ -2,6 +2,6 @@
 *.to
 *.ll
 *.s
-*.t
 TAGS
 nanovg-terra
+nanovg

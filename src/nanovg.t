@@ -52,7 +52,6 @@ end
 
 terra target_game2(nvg : &C.NVGcontext, game : &Game, t : float)
   var x = 2.0f;
-  [ sumtest() ];
 end
 
 
