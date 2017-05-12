@@ -3,6 +3,7 @@
 , bgfx-imgui
 , bgfx-nanovg
 , bx
+, chipmunk
 , gdb
 , genie
 , glew
@@ -24,6 +25,7 @@ let buildInputs = with xlibs; [
       bgfx-imgui
       bgfx-nanovg
       bx
+      chipmunk
       gdb
       genie
       glew
