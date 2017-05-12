@@ -16,7 +16,6 @@
 , nanovg
 , pkgconfig
 , premake4
-, terra
 , xlibs
 }:
 
@@ -39,7 +38,6 @@ let buildInputs = with xlibs; [
       nanovg
       pkgconfig
       premake4
-      terra
     ];
     id = v: v;
     buildPaths = sep: fmt:
