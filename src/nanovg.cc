@@ -14,6 +14,7 @@
 #include "nanosvg-test.h"
 #include "logging.h"
 #include "game.h"
+#include "globals.h"
 
 // TODO: organize me
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))

@@ -10,6 +10,8 @@ OBJS = src/nanovg.o \
        src/nanosvg.o \
        src/game.o \
        src/logging.o \
+       src/globals.o \
+       src/world.o \
        src/entity.o
 
 TOBJS = src/nanovg.to

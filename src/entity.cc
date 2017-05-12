@@ -1,6 +1,6 @@
 
 #include "entity.h"
-#include "game.h"
+#include "globals.h"
 
 void entity_draw(Entity *ent) {
   switch(ent->type) {

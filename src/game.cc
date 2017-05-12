@@ -2,11 +2,11 @@
 #include "game.h"
 #include "logging.h"
 #include "entity.h"
+#include "globals.h"
+#include "world.h"
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-
-struct NVGcontext *nvg;
 
 void world_render(struct game *game);
 void draw_test_ent(struct game *game);
@@ -66,6 +66,11 @@ void
 game_render(Game *game) {
   Entity *entities = game->entities;
   vec2 nudge;
+
+  assert(game->width != 0);
+  assert(game->height != 0);
+  world_render_ground((float)game->width, (float)game->height);
+
   for (int i = 0; i < game->entity_count; ++i) {
     Entity *ent = &game->entities[i];
     nudge.x = cos(game->time);
@@ -80,3 +85,4 @@ game_render(Game *game) {
     nvgRestore(nvg);
   }
 }
+
