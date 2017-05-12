@@ -4,6 +4,8 @@
 
 #include "maths.h"
 
+#define MAX_ENTITIES 4096
+
 enum entity_type {
   entity_test = 0
 };

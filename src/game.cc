@@ -27,26 +27,14 @@ static inline float rand_unit() {
 
 void
 game_init(Game *game) {
-  void *entities = malloc(sizeof(struct entity) * MAX_ENTITIES);
-  game->entities = (struct entity*)entities;
-  game->entity_count = 0;
+  world_init(&game->world);
 }
 
 void
 game_free(Game *game) {
   logdebug("freeing game\n");
-  //free(game->entities);
+  world_free(&game->world);
   logdebug("freed game\n");
-}
-
-int
-game_entity_add(Game *game, Entity *entity) {
-  if (game->entity_count == MAX_ENTITIES) {
-    logwarn("Could not add any more entities");
-    return 0;
-  }
-  game->entities[game->entity_count++] = *entity;
-  return 1;
 }
 
 void game_setup(Game *game) {
@@ -58,31 +46,12 @@ void game_setup(Game *game) {
     vec2 pos = vec2(r1 * game->width, r2 * game->height);
     ent.position = pos;
     ent.type = entity_test;
-    game_entity_add(game, &ent);
+    world_entity_add(&game->world, &ent);
   }
 }
 
 void
 game_render(Game *game) {
-  Entity *entities = game->entities;
-  vec2 nudge;
-
-  assert(game->width != 0);
-  assert(game->height != 0);
-  world_render_ground((float)game->width, (float)game->height);
-
-  for (int i = 0; i < game->entity_count; ++i) {
-    Entity *ent = &game->entities[i];
-    nudge.x = cos(game->time);
-    nudge.y = sin(game->time);
-
-    game->entities[i].position += nudge;
-
-    nvgSave(nvg);
-    nvgTranslate(nvg, ent->position.x, ent->position.y);
-    entity_update(&entities[i]);
-    entity_draw(&entities[i]);
-    nvgRestore(nvg);
-  }
+  world_render(&game->world, game->width, game->height, game->time);
 }
 

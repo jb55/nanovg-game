@@ -1,5 +1,5 @@
 
-LIBS=-lGLEW -lexample-common -lbgfx -lpthread -lGL -lX11 -lglfw -lGLU -lnanovg -lbgfx-nanovg -lbgfx-imgui -lnanogui
+LIBS=-lGLEW -lexample-common -lbgfx -lpthread -lGL -lX11 -lglfw -lGLU -lnanovg -lbgfx-nanovg -lbgfx-imgui -lnanogui -lchipmunk
 
 LINKOPTS = $(LDFLAGS) $(LIBS)
 TFLAGS = -g
