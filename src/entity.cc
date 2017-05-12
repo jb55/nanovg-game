@@ -24,6 +24,6 @@ void entity_test_draw(Entity *ent) {
   nvgStrokeColor(nvg, nvgRGB(0, 0, 0));
   nvgCircle(nvg, 0.0, 0.0, 50.0);
   nvgFill(nvg);
-  nvgStrokeWidth(nvg, 10.0);
+  nvgStrokeWidth(nvg, g_stroke);
   nvgStroke(nvg);
 }
