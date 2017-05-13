@@ -19,7 +19,7 @@ typedef struct game {
 
 void game_init(Game *game);
 void game_free(Game *game);
-void game_render(Game *game);
+void game_frame(Game *game);
 void game_setup(Game *game);
 
 #endif /* GAME_H */

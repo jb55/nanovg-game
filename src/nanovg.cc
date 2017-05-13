@@ -136,7 +136,7 @@ int _main_(int argc, char **argv)
 
     nvgBeginFrame(nvg, width, height, 1.0f);
 
-    game_render(&game);
+    game_frame(&game);
 
     nvgEndFrame(nvg);
 

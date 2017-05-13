@@ -3,7 +3,17 @@
 #include "globals.h"
 #include "logging.h"
 
+#include <chipmunk/chipmunk.h>
+
 #define v2cpv(v2) (cpv((v2).x, (v2).y))
+
+static inline float rand_range(float minv, float maxv) {
+  return ((float(rand()) / float(RAND_MAX)) * (maxv - minv)) + minv;
+}
+
+static inline float rand_unit() {
+  return rand_range(-1.0, 1.0);
+}
 
 void world_init(World *world) {
   void *entities = malloc(sizeof(struct entity) * MAX_ENTITIES);
@@ -19,6 +29,17 @@ void world_load(World *world, float width, float height) {
   world_get_ground_ext(width, height, &ground_top, &ground_bottom);
   world->col_ground =
     cpSegmentShapeNew(static_body, v2cpv(ground_top), v2cpv(ground_bottom), 0);
+
+  Entity ent;
+  for (int i = 0; i < 10; ++i) {
+    float r1 = rand_unit();
+    float r2 = rand_unit();
+    logdebug("rand_unit x y %f %f\n", r1, r2);
+    vec2 pos = vec2(r1 * width, r2 * (height - ground_top.y));
+    ent.position = pos;
+    ent.type = entity_test;
+    world_entity_add(world, &ent);
+  }
 }
 
 void world_unload(World *world) {
@@ -90,4 +111,10 @@ world_render(World *world, int width, int height, float time) {
     entity_draw(&entities[i]);
     nvgRestore(nvg);
   }
+}
+
+
+void
+world_simulate(World *world, float dt) {
+  cpSpaceStep(world->space, dt);
 }
