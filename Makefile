@@ -33,7 +33,7 @@ clean:
 	rm -f nanovg{,-terra}
 	rm -f $(OBJS)
 
-%.d: %.cc Makefile
+%.d: %.cc
 	@rm -f $@; \
 	$(CXX) -MM $(CPPFLAGS) $< > $@.$$$$; \
 	sed 's,\(.*\)\.o[ :]*,src/\1.o $@ : ,g' < $@.$$$$ > $@; \
