@@ -14,6 +14,10 @@ static inline float rand_unit() {
   return rand_range(-1.0, 1.0);
 }
 
+static inline float rand_pos() {
+  return rand_range(0.0, 1.0);
+}
+
 void world_init(World *world) {
   void *entities = malloc(sizeof(struct entity) * MAX_ENTITIES);
   world->entities = (struct entity*)entities;
@@ -29,7 +33,7 @@ void world_load_map(World *world, float width, float height) {
   world_get_ground_ext(width, height, &xy, &wh);
   ground.size = wh;
   entity_create_rect(&ground, dynamics_static);
-  entity_set_position(&ground, xy);
+  entity_set_position(&ground, xy + wh / 2.0f);
   world_entity_add(world, &ground);
 }
 
@@ -40,8 +44,9 @@ void world_load(World *world, float width, float height) {
 
   Entity ent;
   entity_init(&ent);
-  for (int i = 0; i < 5; ++i) {
-    vec2 pos = vec2(width / (i+1), 200.0);
+  for (int i = 0; i < 50; ++i) {
+    vec2 pos = vec2(rand_pos() * width, 200.0);
+    ent.size.x = rand_pos() * 20.0;
     entity_create_ball(&ent);
     entity_set_position(&ent, pos);
     world_entity_add(world, &ent);
@@ -55,9 +60,9 @@ void world_unload(World *world) {
 void world_get_ground_ext(float width, float height, vec2 *xy, vec2 *wh) {
   static const float ratio = 4.0;
   static const float margin = 20.0;
-  xy->x = 10.0;
+  xy->x = -margin;
   xy->y = height - height / ratio;
-  wh->x = width - 10.0;
+  wh->x = width + margin;
   wh->y = height / ratio;
 }
 

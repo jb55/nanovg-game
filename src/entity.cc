@@ -27,17 +27,19 @@ void entity_update(Entity *ent) {
 }
 
 void entity_init(Entity *ent) {
+  static const float defsize = 10.0;
   ent->position = vec2(0, 0);
   ent->type     = entity_test;
   ent->body     = 0;
   ent->shape    = 0;
-  ent->size     = vec2(20.0, 20.0);
+  ent->size     = vec2(defsize, defsize);
   ent->mass     = 1.0;
   ent->friction = 0.7;
 }
 
 void entity_ball_draw(Entity *ent) {
   nvgBeginPath(nvg);
+  float offset = ent->size.x * 2;
   nvgTranslate(nvg, ent->position.x, ent->position.y);
   nvgFillColor(nvg, nvgRGB(255, 255, 255));
   nvgStrokeColor(nvg, nvgRGB(0, 0, 0));
@@ -49,15 +51,15 @@ void entity_ball_draw(Entity *ent) {
 }
 
 void entity_rect_draw(Entity *ent) {
+  static const float color = 0.4;
   nvgBeginPath(nvg);
-  nvgFillColor(nvg, nvgRGBf(0.5, 0.5, 0.5));
+  nvgFillColor(nvg, nvgRGBf(color, color, color));
   nvgStrokeColor(nvg, nvgRGB(0, 0, 0));
-  nvgRect(nvg, ent->position.x, ent->position.y, ent->size.x, ent->size.y);
-  logdebug("drawing rect %f %f %f %f\n",
-           ent->position.x, ent->position.y, ent->size.x, ent->size.y);
+  // ORIGIN COORDS!
+  nvgRect(nvg,
+          ent->position.x - ent->size.x / 2,
+          ent->position.y - ent->size.y / 2, ent->size.x, ent->size.y);
   nvgFill(nvg);
-  nvgStrokeWidth(nvg, g_stroke);
-  nvgStroke(nvg);
 }
 
 void entity_test_draw(Entity *ent) {
@@ -87,6 +89,8 @@ void entity_create_rect(Entity *ent, enum entity_dynamics dynamics) {
   ent->shape = shape;
   ent->body = body;
 
+  cpShapeSetElasticity(shape, 0.5);
+  cpShapeSetFriction(shape, 0.1);
   // TODO: non-static rect friction
 }
 
@@ -95,6 +99,7 @@ void entity_create_ball(Entity *ent) {
   // TODO: plan for freeing physics stuff when done with it
   const float mass = ent->mass;
   const float radius = ent->size.x;
+  const cpVect offset = cpv(radius, radius);
   float moment = cpMomentForCircle(mass, 0, radius, cpvzero);
   cpBody *body = cpBodyNew(mass, moment);
   cpShape *shape = cpCircleShapeNew(body, radius, cpvzero);
@@ -103,8 +108,8 @@ void entity_create_ball(Entity *ent) {
   ent->body = body;
   logdebug("m %f r %f m %f body %x shape %x\n",
            mass, radius, moment, body, shape);
-  cpShapeSetFriction(shape, 0.0);
-  cpShapeSetElasticity(shape, 0.8);
+  cpShapeSetFriction(shape, 0.5);
+  cpShapeSetElasticity(shape, 0.5);
 }
 
 const char * entity_name(Entity *ent) {
