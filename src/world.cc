@@ -2,10 +2,9 @@
 #include "world.h"
 #include "globals.h"
 #include "logging.h"
+#include <cmath>
 
 #include <chipmunk/chipmunk.h>
-
-#define v2cpv(v2) (cpv((v2).x, (v2).y))
 
 static inline float rand_range(float minv, float maxv) {
   return ((float(rand()) / float(RAND_MAX)) * (maxv - minv)) + minv;
@@ -23,21 +22,28 @@ void world_init(World *world) {
   world->space = cpSpaceNew();
 }
 
+void world_load_map(World *world, float width, float height) {
+  vec2 xy, wh;
+  Entity ground;
+  entity_init(&ground);
+  world_get_ground_ext(width, height, &xy, &wh);
+  ground.size = wh;
+  entity_create_rect(&ground, dynamics_static);
+  entity_set_position(&ground, xy);
+  world_entity_add(world, &ground);
+}
+
 void world_load(World *world, float width, float height) {
   vec2 ground_top, ground_bottom;
-  cpBody *static_body = cpSpaceGetStaticBody(world->space);
-  world_get_ground_ext(width, height, &ground_top, &ground_bottom);
-  world->col_ground =
-    cpSegmentShapeNew(static_body, v2cpv(ground_top), v2cpv(ground_bottom), 0);
+  world_set_gravity(world, vec2(0.0, 0.1));
+  world_load_map(world, width, height);
 
   Entity ent;
-  for (int i = 0; i < 10; ++i) {
-    float r1 = rand_unit();
-    float r2 = rand_unit();
-    logdebug("rand_unit x y %f %f\n", r1, r2);
-    vec2 pos = vec2(r1 * width, r2 * (height - ground_top.y));
-    ent.position = pos;
-    ent.type = entity_test;
+  entity_init(&ent);
+  for (int i = 0; i < 5; ++i) {
+    vec2 pos = vec2(width / (i+1), 200.0);
+    entity_create_ball(&ent);
+    entity_set_position(&ent, pos);
     world_entity_add(world, &ent);
   }
 }
@@ -46,13 +52,13 @@ void world_unload(World *world) {
   // TODO: free col_ground
 }
 
-void world_get_ground_ext(float width, float height, vec2 *top_left, vec2 *bottom_right) {
+void world_get_ground_ext(float width, float height, vec2 *xy, vec2 *wh) {
   static const float ratio = 4.0;
   static const float margin = 20.0;
-  top_left->x = -margin;
-  top_left->y = height - height / ratio;
-  bottom_right->x = width + margin*2;
-  bottom_right->y = height / ratio + margin;
+  xy->x = 10.0;
+  xy->y = height - height / ratio;
+  wh->x = width - 10.0;
+  wh->y = height / ratio;
 }
 
 void world_free(World *world) {
@@ -87,27 +93,30 @@ world_entity_add(World *world, Entity *entity) {
     return 0;
   }
   world->entities[world->entity_count++] = *entity;
+
+  // hook up collision here? probably.
+  if (entity->body && entity->shape) {
+    cpSpaceAddBody(world->space, entity->body);
+    cpSpaceAddShape(world->space, entity->shape);
+  }
+  else {
+    logwarn("Collision missing when adding %s", entity_name(entity));
+  }
+  // TODO: unhook collision when removed from world?
   return 1;
 }
 
 
 void
-world_render(World *world, int width, int height, float time) {
+world_render(World *world, float width, float height, float time) {
   Entity *entities = world->entities;
   vec2 nudge;
 
-  world_render_ground((float)width, (float)height);
+  //world_render_ground(width, height);
 
   for (int i = 0; i < world->entity_count; ++i) {
     Entity *ent = &world->entities[i];
-    nudge.x = cos(time);
-    nudge.y = sin(time);
-
-    world->entities[i].position += nudge;
-
     nvgSave(nvg);
-    nvgTranslate(nvg, ent->position.x, ent->position.y);
-    entity_update(&entities[i]);
     entity_draw(&entities[i]);
     nvgRestore(nvg);
   }
@@ -115,6 +124,20 @@ world_render(World *world, int width, int height, float time) {
 
 
 void
-world_simulate(World *world, float dt) {
+world_entity_update(World *world, Entity *entity) {
+  cpVect pos = cpBodyGetPosition(entity->body);
+  cpVect vel = cpBodyGetVelocity(entity->body);
+  entity->position = vec2(pos.x, pos.y);
+  entity->velocity = vec2(vel.x, vel.y);
+}
+
+void
+world_update(World *world, float dt) {
+
+  for (int i = 0; i < world->entity_count; ++i) {
+    Entity *ent = &world->entities[i];
+    world_entity_update(world, ent);
+  }
+
   cpSpaceStep(world->space, dt);
 }

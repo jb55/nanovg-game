@@ -26,10 +26,12 @@ game_free(Game *game) {
 }
 
 void game_setup(Game *game) {
+  world_load(&game->world, game->width, game->height);
 }
 
 void game_frame(Game *game) {
-  world_simulate(&game->world, game->time);
+  world_update(&game->world, game->time);
   world_render(&game->world, game->width, game->height, game->time);
 }
+
 
