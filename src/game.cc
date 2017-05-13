@@ -13,10 +13,6 @@ void draw_test_ent(struct game *game);
 void entity_draw(struct entity *ent);
 void entity_test_draw(struct entity *ent);
 
-static inline float rand_nat() {
-  return (float)((double) rand() / (double)RAND_MAX);
-}
-
 static inline float rand_range(float minv, float maxv) {
   return ((float(rand()) / float(RAND_MAX)) * (maxv - minv)) + minv;
 }
