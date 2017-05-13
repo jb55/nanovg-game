@@ -16,6 +16,7 @@ void entity_update(Entity *ent) {
 void entity_init(Entity *ent) {
   ent->position = vec2(0, 0);
   ent->type     = entity_test;
+  ent->collision_shape = 0;
 }
 
 void entity_test_draw(Entity *ent) {
@@ -26,4 +27,10 @@ void entity_test_draw(Entity *ent) {
   nvgFill(nvg);
   nvgStrokeWidth(nvg, g_stroke);
   nvgStroke(nvg);
+}
+
+void entity_create_ball(Entity *ent) {
+  ent->type = entity_ball;
+  // TODO: plan for freeing physics stuff when done with it
+  // ent->collision_shape = 
 }
