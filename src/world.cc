@@ -18,7 +18,7 @@ static inline float rand_pos() {
   return rand_range(0.0, 1.0);
 }
 
-void world_init(World *world) {
+void world_init(struct world *world) {
   void *entities = malloc(sizeof(struct entity) * MAX_ENTITIES);
   world->entities = (struct entity*)entities;
   assert(world->entities);
@@ -26,34 +26,36 @@ void world_init(World *world) {
   world->space = cpSpaceNew();
 }
 
-void world_load_map(World *world, float width, float height) {
+void world_load_map(struct world *world, float width, float height) {
   vec2 xy, wh;
-  Entity ground;
+  struct entity ground;
+  struct ent_rect rect;
   entity_init(&ground);
   world_get_ground_ext(width, height, &xy, &wh);
-  ground.size = wh;
-  entity_create_rect(&ground, dynamics_static);
+  rect.size = wh;
+  entity_create_rect(&ground, &rect, dynamics_static);
   entity_set_position(&ground, xy + wh / 2.0f);
   world_entity_add(world, &ground);
 }
 
-void world_load(World *world, float width, float height) {
+void world_load(struct world *world, float width, float height) {
   vec2 ground_top, ground_bottom;
   world_set_gravity(world, vec2(0.0, 0.1));
   world_load_map(world, width, height);
 
-  Entity ent;
+  struct entity ent;
+  struct ent_ball ball;
   entity_init(&ent);
   for (int i = 0; i < 50; ++i) {
     vec2 pos = vec2(rand_pos() * width, 200.0);
-    ent.size.x = rand_pos() * 20.0;
-    entity_create_ball(&ent);
+    ball.radius = rand_pos() * 20.0;
+    entity_create_ball(&ent, &ball);
     entity_set_position(&ent, pos);
     world_entity_add(world, &ent);
   }
 }
 
-void world_unload(World *world) {
+void world_unload(struct world *world) {
   // TODO: free col_ground
 }
 
@@ -66,11 +68,11 @@ void world_get_ground_ext(float width, float height, vec2 *xy, vec2 *wh) {
   wh->y = height / ratio;
 }
 
-void world_free(World *world) {
+void world_free(struct world *world) {
   cpSpaceFree(world->space);
 }
 
-void world_set_gravity(World *world, vec2 v2) {
+void world_set_gravity(struct world *world, vec2 v2) {
   cpVect gravity = cpv(v2.x, v2.y);
   cpSpaceSetGravity(world->space, gravity);
 }
@@ -92,7 +94,7 @@ void world_render_ground(float width, float height) {
 }
 
 int
-world_entity_add(World *world, Entity *entity) {
+world_entity_add(struct world *world, struct entity *entity) {
   if (world->entity_count == MAX_ENTITIES) {
     logwarn("Could not add any more entities");
     return 0;
@@ -113,14 +115,14 @@ world_entity_add(World *world, Entity *entity) {
 
 
 void
-world_render(World *world, float width, float height, float time) {
-  Entity *entities = world->entities;
+world_render(struct world *world, float width, float height, float time) {
+  struct entity *entities = world->entities;
   vec2 nudge;
 
   //world_render_ground(width, height);
 
   for (int i = 0; i < world->entity_count; ++i) {
-    Entity *ent = &world->entities[i];
+    struct entity *ent = &world->entities[i];
     nvgSave(nvg);
     entity_draw(&entities[i]);
     nvgRestore(nvg);
@@ -129,7 +131,7 @@ world_render(World *world, float width, float height, float time) {
 
 
 void
-world_entity_update(World *world, Entity *entity) {
+world_entity_update(struct world *world, struct entity *entity) {
   cpVect pos = cpBodyGetPosition(entity->body);
   cpVect vel = cpBodyGetVelocity(entity->body);
   entity->position = vec2(pos.x, pos.y);
@@ -137,10 +139,10 @@ world_entity_update(World *world, Entity *entity) {
 }
 
 void
-world_update(World *world, float dt) {
+world_update(struct world *world, float dt) {
 
   for (int i = 0; i < world->entity_count; ++i) {
-    Entity *ent = &world->entities[i];
+    struct entity *ent = &world->entities[i];
     world_entity_update(world, ent);
   }
 

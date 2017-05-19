@@ -13,7 +13,7 @@ typedef struct game {
 
   int fontNormal;
 
-  World world;
+  struct world world;
   int entity_count;
 } Game;
 
