@@ -6,6 +6,8 @@
 #include <chipmunk/chipmunk.h>
 
 #define MAX_ENTITIES 4096
+#define MAX_NAME_SIZE 16
+
 
 enum entity_type {
   entity_test   = 0,
@@ -20,7 +22,7 @@ enum entity_dynamics {
 };
 
 struct ent_player {
-  char *name;
+  char name[MAX_NAME_SIZE];
 };
 
 struct ent_ball {
@@ -54,12 +56,17 @@ entity_create_ball(struct entity *, struct ent_ball *);
 struct ent_rect *
 entity_create_rect(struct entity *, struct ent_rect *, enum entity_dynamics);
 
+struct ent_player *
+entity_create_player(struct entity *, struct ent_player *);
+
 void entity_draw(struct entity *);
 void entity_init(struct entity *);
+void entity_player_draw(struct entity *);
 void entity_rect_draw(struct entity *);
 void entity_set_position(struct entity *, vec2 pos);
 void entity_test_draw(struct entity *);
 void entity_update(struct entity *);
+
 
 const char* entity_name(struct entity *);
 

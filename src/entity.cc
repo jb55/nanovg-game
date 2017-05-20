@@ -2,6 +2,7 @@
 #include "entity.h"
 #include "globals.h"
 #include "logging.h"
+#include <cstring>
 
 const struct entity_def entity_defs[] = {
   { "test" },
@@ -22,12 +23,12 @@ void entity_draw(struct entity *ent) {
     entity_rect_draw(ent);
     break;
   case entity_player:
-    entity_rect_draw(ent);
+    entity_player_draw(ent);
     break;
   }
 }
 
-void entity_update(struct entity *ent) {
+void entity_player_draw(struct entity *ent) {
 }
 
 void entity_init(struct entity *ent) {
@@ -38,6 +39,11 @@ void entity_init(struct entity *ent) {
   ent->shape    = 0;
   ent->mass     = 1.0;
   ent->friction = 0.7;
+}
+
+struct ent_player *
+entity_create_player(struct entity *ent, struct ent_player *player) {
+  ent->data.player = *player;
 }
 
 void entity_ball_draw(struct entity *ent) {
@@ -98,10 +104,17 @@ entity_create_rect(struct entity *ent, struct ent_rect *rect, enum entity_dynami
   ent->body = body;
 
   cpShapeSetElasticity(shape, 0.5);
-  cpShapeSetFriction(shape, 0.1);
+  cpShapeSetFriction(shape, 1.0);
   // TODO: non-static rect friction
 
   return rect;
+}
+
+struct ent_player *
+entity_create_player(struct entity *ent, const char *name) {
+  memcpy(ent->data.player.name, name, MAX_NAME_SIZE);
+
+  return &ent->data.player;
 }
 
 struct ent_ball *
@@ -120,7 +133,7 @@ entity_create_ball(struct entity *ent, struct ent_ball *ball) {
   ent->body = body;
   logdebug("m %f r %f m %f body %x shape %x\n",
            mass, radius, moment, body, shape);
-  cpShapeSetFriction(shape, 0.5);
+  cpShapeSetFriction(shape, 0.7);
   cpShapeSetElasticity(shape, 0.5);
 
   return &ent->data.ball;
