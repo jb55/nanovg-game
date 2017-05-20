@@ -67,7 +67,6 @@ void entity_set_position(struct entity *, vec2 pos);
 void entity_test_draw(struct entity *);
 void entity_update(struct entity *);
 
-
 const char* entity_name(struct entity *);
 
 struct entity_def {
