@@ -46,8 +46,8 @@ void world_load(struct world *world, float width, float height) {
   struct entity ent;
   struct ent_ball ball;
   entity_init(&ent);
-  for (int i = 0; i < 50; ++i) {
-    vec2 pos = vec2(rand_pos() * width, 200.0);
+  for (int i = 0; i < 10; ++i) {
+    vec2 pos = vec2(rand_pos() * width, 200.0 * rand_pos());
     ball.radius = rand_pos() * 20.0;
     entity_create_ball(&ent, &ball);
     entity_set_position(&ent, pos);
