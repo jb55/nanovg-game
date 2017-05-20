@@ -1,0 +1,10 @@
+* TODO release game 2018
+
+* Ideas
+** cant move without rope
+** skill comes from timing rope movements accurately 
+** multiplayer
+
+  
+* TODO player entity
+* TODO fixed timestep for chipmunk?
