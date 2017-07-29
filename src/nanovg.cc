@@ -110,17 +110,29 @@ int _main_(int argc, char **argv)
 
   bgfx::setViewSeq(0, true);
 
-  int64_t timeOffset = bx::getHPCounter();
+  double t = 0.0;
+  const double timestep = 1.0/60.0;
+  int64_t lastTime = bx::getHPCounter();
+  double accumulator = 0;
 
   entry::MouseState mouseState;
   while (!entry::processEvents(width, height, debug, reset, &mouseState) )
   {
     int64_t now = bx::getHPCounter();
-    const double freq = double(bx::getHPFrequency() );
-    float time = (float)( (now-timeOffset)/freq);
-    game.time = time;
+    const double freq = double(bx::getHPFrequency() ) / 6.0;
+    double frameTime = (double)((now - lastTime) / freq);
+    lastTime = now;
+
     game.width = width;
     game.height = height;
+
+    accumulator += frameTime;
+
+    while ( accumulator >= timestep ) {
+      cpSpaceStep(game.world.space, timestep);
+      accumulator -= timestep;
+      t += timestep;
+    }
 
     if (!setup) {
       game_setup(&game);

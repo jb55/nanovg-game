@@ -40,7 +40,7 @@ void world_load_map(struct world *world, float width, float height) {
 
 void world_load(struct world *world, float width, float height) {
   vec2 ground_top, ground_bottom;
-  world_set_gravity(world, vec2(0.0, 0.1));
+  world_set_gravity(world, vec2(0.0, 10.0));
   world_load_map(world, width, height);
 
   struct entity ent;
@@ -146,5 +146,4 @@ world_update(struct world *world, float dt) {
     world_entity_update(world, ent);
   }
 
-  cpSpaceStep(world->space, dt);
 }
